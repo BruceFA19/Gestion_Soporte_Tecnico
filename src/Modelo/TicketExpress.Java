@@ -1,7 +1,6 @@
 package Modelo;
 
-import util.FechaHora;
-
+import java.time.LocalDateTime;
 
  // Atencion rapida en ventanilla )reseteos,desbloqeo de tokens....
  
@@ -11,9 +10,9 @@ public class TicketExpress extends Ticket {
     private boolean resueltoEnVentanilla;
 
     public TicketExpress(String codigoTicket, Solicitante solicitante, DispositivoEquipo equipoAfectado,
-                         TipoProblema problema, FechaHora fechaHoraLlegada, int alcanceUsuarios,
+                         TipoProblema problema, LocalDateTime LocalDateTimeLlegada, int alcanceUsuarios,
                          int gradoBloqueo, int tiempoLimiteMinutos) {
-        super(codigoTicket, solicitante, equipoAfectado, problema, fechaHoraLlegada, alcanceUsuarios, gradoBloqueo);
+        super(codigoTicket, solicitante, equipoAfectado, problema, LocalDateTimeLlegada, alcanceUsuarios, gradoBloqueo);
         this.tiempoLimiteMinutos = tiempoLimiteMinutos;
         this.resueltoEnVentanilla = false;
     }
