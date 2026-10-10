@@ -1,4 +1,4 @@
-package Modelo;
+package Modelo.Tickets.Enums;
 
 // NIVEL DE PRIORIDAD DE UN TICKET (1 a 4)
 
@@ -17,4 +17,7 @@ public enum NivelPrioridad {
     public int getValor() {
         return valor;
     }
+
+    //Codigo en espera de implementacion:
+    //BAJA, MEDIA, ALTA, CRITICA
 }

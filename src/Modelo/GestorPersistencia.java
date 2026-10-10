@@ -2,7 +2,8 @@ package Modelo;
 
 import Estructuras.ColaPrioridad;
 import Estructuras.TablaHash;
-import Estructuras.ListaEnlazadas;
+import Estructuras.ListaEnlazada;
+import Modelo.Tickets.Ticket;
 
 //Guarda y carga usuarios, tickets en archivos
 
@@ -28,12 +29,12 @@ public class GestorPersistencia {
         return null;
     }
 
-    public boolean guardarTicketsEnArchivo(ColaPrioridad<Ticket> cola, ListaEnlazadas<Ticket> historico) {
+    public boolean guardarTicketsEnArchivo(ColaPrioridad<Ticket> cola, ListaEnlazada<Ticket> historico) {
         // TODO
         return false;
     }
 
-    public ListaEnlazadas<Ticket> cargarTicketsDesdeArchivo() {
+    public ListaEnlazada<Ticket> cargarTicketsDesdeArchivo() {
         // TODO
         return null;
     }

@@ -1,5 +1,7 @@
 package Modelo;
 
+import Modelo.Tickets.Ticket;
+
 import java.time.LocalDateTime;
 
 

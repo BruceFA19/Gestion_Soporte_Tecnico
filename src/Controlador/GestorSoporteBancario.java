@@ -3,7 +3,7 @@ package Controlador;
 
 
 import Estructuras.ColaPrioridad;
-import Estructuras.ListaEnlazadas;
+import Estructuras.ListaEnlazada;
 import Estructuras.Pila;
 import Estructuras.TablaHash;
 import Modelo.AccionAuditoria;
@@ -12,7 +12,7 @@ import Modelo.EvaluadorPrioridadEquipo;
 import Modelo.GestorPersistencia;
 import Modelo.Solicitante;
 import Modelo.Tecnico;
-import Modelo.Ticket;
+import Modelo.Tickets.Ticket;
 import Modelo.TipoProblema;
 import Modelo.Usuario;
 
@@ -21,7 +21,7 @@ import Modelo.Usuario;
 public class GestorSoporteBancario{
     private ColaPrioridad<Ticket> colaTurnosPendientes;
     private TablaHash<String, Usuario> listaUsuarios;
-    private ListaEnlazadas<Ticket> historicoTickets;
+    private ListaEnlazada<Ticket> historicoTickets;
     private Pila<AccionAuditoria>pilaAuditoria;
     private EvaluadorPrioridadEquipo evaluadorPrioridad;
     private GestorPersistencia gestorPersistencia;
@@ -29,7 +29,7 @@ public class GestorSoporteBancario{
     public GestorSoporteBancario(){
         this.colaTurnosPendientes=new ColaPrioridad<>();
         this.listaUsuarios = new TablaHash<>();
-        this.historicoTickets = new ListaEnlazadas<>();
+        this.historicoTickets = new ListaEnlazada<>();
         this.pilaAuditoria = new Pila<>();	
         this.evaluadorPrioridad = new EvaluadorPrioridadEquipo();
         this.gestorPersistencia = new GestorPersistencia("data/usuarios.txt", "data/tickets.txt", "data/historial.txt");

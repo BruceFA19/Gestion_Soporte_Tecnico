@@ -3,6 +3,8 @@ package Modelo;
 // Calcula el puntaje total (criticidad + alcance + bloqueo, CADA UNO DE 1 A 3) y lo clasifica en un nuvel de priordad
 // >= 8 -> CRITICA | 6-7 -> ALTA | 4-5 -> MEDIA | 3 -> BAJA
 
+import Modelo.Tickets.Enums.NivelPrioridad;
+
 public class EvaluadorPrioridadEquipo {
 
     private int umbralPrioridadCritica;

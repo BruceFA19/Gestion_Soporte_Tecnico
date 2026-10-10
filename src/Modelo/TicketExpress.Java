@@ -1,5 +1,7 @@
 package Modelo;
 
+import Modelo.Tickets.Ticket;
+
 import java.time.LocalDateTime;
 
  // Atencion rapida en ventanilla )reseteos,desbloqeo de tokens....

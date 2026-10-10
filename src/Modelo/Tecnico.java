@@ -2,6 +2,8 @@ package Modelo;
 
 // Personal Informatico De Atencion Presencial
 
+import Modelo.Tickets.Ticket;
+
 public class Tecnico extends Usuario {
 
     private String especialidad;

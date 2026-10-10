@@ -1,6 +1,7 @@
 package Modelo;
 
-import Estructuras.ListaEnlazadas;
+import Estructuras.ListaEnlazada;
+import Modelo.Tickets.Ticket;
 
 // Empleado bancario que acude a soporte tecnicco presencial
 
@@ -9,7 +10,7 @@ public class Solicitante extends Usuario {
     private Departamento departamento;
     private String codigoEmpleado;
     private String extensionTelefonica;
-    private ListaEnlazadas<Ticket> misTickets;
+    private ListaEnlazada<Ticket> misTickets;
 
     public Solicitante(String idUsuario, String nombre, String apellido, String cedula,
                        String usuarioRedBancaria, String contraseniaHash,
@@ -18,7 +19,7 @@ public class Solicitante extends Usuario {
         this.departamento = departamento;
         this.codigoEmpleado = codigoEmpleado;
         this.extensionTelefonica = extensionTelefonica;
-        this.misTickets = new ListaEnlazadas<>();
+        this.misTickets = new ListaEnlazada<>();
     }
 
     public Ticket solicitarTurnoPresencial(TipoProblema problema, DispositivoEquipo equipo,
@@ -39,5 +40,5 @@ public class Solicitante extends Usuario {
     public Departamento getDepartamento() { return departamento; }
     public String getCodigoEmpleado() { return codigoEmpleado; }
     public String getExtensionTelefonica() { return extensionTelefonica; }
-    public ListaEnlazadas<Ticket> getMisTickets() { return misTickets; }
+    public ListaEnlazada<Ticket> getMisTickets() { return misTickets; }
 }

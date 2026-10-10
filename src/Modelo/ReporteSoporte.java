@@ -2,7 +2,9 @@ package Modelo;
 
 // importar  Estructuras.ListaEnlazada cuando se haga
 
-import Estructuras.ListaEnlazadas;
+import Estructuras.ListaEnlazada;
+import Modelo.Tickets.Ticket;
+
 import java.time.LocalDateTime;
 
 // Reporte con estadisticas de desempeño del soporte
@@ -18,7 +20,7 @@ public class ReporteSoporte {
         this.fechaReporte = fechaReporte;
     }
 
-    public void generarEstadisticas(ListaEnlazadas<Ticket> listaTickets) {
+    public void generarEstadisticas(ListaEnlazada<Ticket> listaTickets) {
         // Recorrer listaTickets y calcular totalTicketsAtendidos y los tiempos promedio
     }
 
