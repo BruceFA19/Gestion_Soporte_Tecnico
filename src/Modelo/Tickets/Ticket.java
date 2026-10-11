@@ -32,9 +32,24 @@ public abstract class Ticket {
     /*public Ticket() {
     }*/
 
+    public Ticket(String codigoTicket, String idSolicitante, String titulo, String descripcion) {
+        this.codigoTicket = codigoTicket;
+        this.idSolicitante = idSolicitante;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+
+        // Autogenerados
+        this.idTecnicoAsignado = "SIN_ASIGNAR";
+        this.fechaCreacion = LocalDateTime.now();
+        this.estado = EstadoTicket.ABIERTO;
+        this.historialComentarios = new ListaEnlazada<>();
+    }
+
     public Ticket(String codigoTicket, String idSolicitante, String idTecnicoAsignado, String titulo,
                   String descripcion, LocalDateTime fechaCreacion, LocalDateTime fechaResolucion,
+                  LocalDateTime fechaLimiteResolucion, // ¡Aquí está el SLA recuperado!
                   EstadoTicket estado, NivelPrioridad nivelPrioridad, ListaEnlazada<Comentario> historialComentarios) {
+
         this.codigoTicket = codigoTicket;
         this.idSolicitante = idSolicitante;
         this.idTecnicoAsignado = idTecnicoAsignado;
@@ -42,10 +57,13 @@ public abstract class Ticket {
         this.descripcion = descripcion;
         this.fechaCreacion = fechaCreacion;
         this.fechaResolucion = fechaResolucion;
+        this.fechaLimiteResolucion = fechaLimiteResolucion; // Se asigna aquí
         this.estado = estado;
         this.nivelPrioridad = nivelPrioridad;
         this.historialComentarios = historialComentarios;
     }
+
+    public abstract void calcularPrioridadAutomatica();
 
     public abstract long calcularTiempoEstimadoAtencion();
 
