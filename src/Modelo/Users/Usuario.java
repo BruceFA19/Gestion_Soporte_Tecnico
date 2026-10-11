@@ -1,6 +1,4 @@
-package Modelo;
-
-import java.nio.charset.StandardCharsets;
+package Modelo.Users;
 
 // Clase base para todos los roles de la entidad bancaria
 

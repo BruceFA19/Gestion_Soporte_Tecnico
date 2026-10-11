@@ -4,6 +4,7 @@ import Estructuras.ColaPrioridad;
 import Estructuras.TablaHash;
 import Estructuras.ListaEnlazada;
 import Modelo.Tickets.Ticket;
+import Modelo.Users.Usuario;
 
 //Guarda y carga usuarios, tickets en archivos
 

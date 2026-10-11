@@ -10,11 +10,11 @@ import Modelo.AccionAuditoria;
 import Modelo.DispositivoEquipo;
 import Modelo.EvaluadorPrioridadEquipo;
 import Modelo.GestorPersistencia;
-import Modelo.Solicitante;
-import Modelo.Tecnico;
+import Modelo.Users.Solicitante;
+import Modelo.Users.Tecnico;
 import Modelo.Tickets.Ticket;
-import Modelo.TipoProblema;
-import Modelo.Usuario;
+import Modelo.Tickets.Incidencia.TipoProblema;
+import Modelo.Users.Usuario;
 
 //ESTO ES EL CONTROLADOR PRINCIPAL DEL SISTEMA
 

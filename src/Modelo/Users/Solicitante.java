@@ -1,7 +1,9 @@
-package Modelo;
+package Modelo.Users;
 
 import Estructuras.ListaEnlazada;
+import Modelo.DispositivoEquipo;
 import Modelo.Tickets.Ticket;
+import Modelo.Tickets.Incidencia.TipoProblema;
 
 // Empleado bancario que acude a soporte tecnicco presencial
 

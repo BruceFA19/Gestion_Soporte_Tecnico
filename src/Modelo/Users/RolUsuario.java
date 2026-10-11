@@ -1,4 +1,4 @@
-package Modelo;
+package Modelo.Users;
 
 public enum RolUsuario{
     SOLICITANTE,

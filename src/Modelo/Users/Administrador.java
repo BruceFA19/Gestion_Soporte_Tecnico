@@ -1,8 +1,10 @@
-package Modelo;
+package Modelo.Users;
 
 // SUPERVISOR CON CONTROL DE LA ATENCION Y DE LAS CONFIGURACION DEL SISTEMA
 
-public class Administrador extends Usuario{
+import Modelo.ReporteSoporte;
+
+public class Administrador extends Usuario {
 
     private String codigoAdministrador;
     private int nivelAcceso;
