@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 public class TicketRequerimiento extends Ticket {
     // 1. Atributos exclusivos de solicitudes (No hay impactos ni bloqueos)
-    private String tipoServicioSolicitado;  // Ej: "Instalación de Software", "Acceso VPN"
+    private TipoServicio tipoServicio;  // Ej: "Instalación de Software", "Acceso VPN"
     private boolean requiereAprobacion;     // Define si el jefe debe autorizarlo primero
     private boolean estaAprobado;           // Estado actual de esa autorización
 
@@ -18,19 +18,12 @@ public class TicketRequerimiento extends Ticket {
     // CONSTRUCTOR 1: Para crear requerimientos NUEVOS (Desde el menú)
     // ==========================================================
     public TicketRequerimiento(String codigoTicket, String idSolicitante, String titulo,
-                               String descripcion, String tipoServicio, boolean requiereAprobacion) {
-
-        // Datos base al padre
+                               String descripcion, TipoServicio tipoServicio) {
         super(codigoTicket, idSolicitante, titulo, descripcion);
-
-        // Datos específicos
-        this.tipoServicioSolicitado = tipoServicio;
-        this.requiereAprobacion = requiereAprobacion;
-
-        // Si no requiere aprobación del jefe, nace aprobado automáticamente
-        this.estaAprobado = !requiereAprobacion;
-
-        // Fijamos el SLA estandarizado
+        this.tipoServicio = tipoServicio;
+        // Lógica de negocio: Si el servicio NO requiere aprobación, nace aprobado.
+        // Si SÍ requiere, nace bloqueado (false) hasta que un jefe lo apruebe.
+        this.estaAprobado = !tipoServicio.isRequiereAprobacion();
         this.calcularPrioridadAutomatica();
     }
 
@@ -42,35 +35,34 @@ public class TicketRequerimiento extends Ticket {
                                LocalDateTime fechaResolucion, LocalDateTime fechaLimiteResolucion,
                                EstadoTicket estado, NivelPrioridad nivelPrioridad,
                                ListaEnlazada<Comentario> historialComentarios,
-                               // Atributos específicos recuperados del txt:
-                               String tipoServicioSolicitado, boolean requiereAprobacion, boolean estaAprobado) {
-
-        // Reconstrucción de la parte padre
+                               TipoServicio tipoServicio, boolean estaAprobado) { // Atributos recuperados
         super(codigoTicket, idSolicitante, idTecnicoAsignado, titulo, descripcion,
                 fechaCreacion, fechaResolucion, fechaLimiteResolucion, estado, nivelPrioridad, historialComentarios);
-
-        // Reconstrucción de la parte hija
-        this.tipoServicioSolicitado = tipoServicioSolicitado;
-        this.requiereAprobacion = requiereAprobacion;
+        this.tipoServicio = tipoServicio;
         this.estaAprobado = estaAprobado;
     }
-
     // ==========================================================
     // MÉTODOS OBLIGATORIOS (Polimorfismo)
     // ==========================================================
-
     @Override
     public long calcularTiempoEstimadoAtencion() {
-        return 48; // Todo requerimiento estándar toma hasta 48 horas hábiles
+        // ¡Magia! El SLA ya no es un número fijo inventado.
+        // Se extrae dinámicamente de lo que dicta el catálogo para este servicio.
+        return this.tipoServicio.getTiempoEntregaHoras();
     }
-
     @Override
     public void calcularPrioridadAutomatica() {
-        // Los requerimientos suelen ser rutinarios
+        // Los requerimientos del catálogo siempre tienen prioridad baja/estándar
         this.nivelPrioridad = NivelPrioridad.BAJA;
 
         // Alimentamos la métrica del SLA
         long horasEstimadas = this.calcularTiempoEstimadoAtencion();
         this.fechaLimiteResolucion = this.fechaCreacion.plusHours(horasEstimadas);
     }
+    // --- Getters y Setters ---
+    public void aprobarRequerimiento() {
+        this.estaAprobado = true;
+    }
+    public boolean isEstaAprobado() { return estaAprobado; }
+    public TipoServicio getTipoServicio() { return tipoServicio; }
 }
