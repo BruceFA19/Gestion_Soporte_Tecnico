@@ -1,4 +1,4 @@
-package Modelo.Tickets.Enums;
+package Modelo.Enums;
 
 //Estados posibles de un Ticket
 public enum EstadoTicket {

@@ -1,4 +1,4 @@
-package Modelo;
+package Persistencia;
 
 import Estructuras.ColaPrioridad;
 import Estructuras.TablaHash;

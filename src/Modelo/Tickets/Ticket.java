@@ -1,12 +1,12 @@
 package Modelo.Tickets;
 
 import Estructuras.ListaEnlazada;
-import Modelo.Tickets.Enums.EstadoTicket;
-import Modelo.Tickets.Enums.NivelPrioridad;
+import Modelo.Enums.EstadoTicket;
+import Modelo.Enums.NivelPrioridad;
 
 import java.time.LocalDateTime;
 
-public abstract class Ticket {
+public abstract class Ticket implements Comparable<Ticket> {
     // 1. Identificadores Básicos (Usamos Strings para la persistencia en archivos)
     protected String codigoTicket;       // Ej: "TIC-1001"
     protected String idSolicitante;      // ID del usuario que crea el ticket
@@ -29,8 +29,7 @@ public abstract class Ticket {
 
     protected LocalDateTime fechaLimiteResolucion; // El famoso SLA
 
-    /*public Ticket() {
-    }*/
+    protected int puntajePrioridad;
 
     public Ticket(String codigoTicket, String idSolicitante, String titulo, String descripcion) {
         this.codigoTicket = codigoTicket;
@@ -101,5 +100,17 @@ public abstract class Ticket {
 
     public NivelPrioridad getNivelPrioridad() {
         return nivelPrioridad;
+    }
+
+    public int getPuntajePrioridad() {
+        return puntajePrioridad;
+    }
+
+    @Override
+    public int compareTo(Ticket otroTicket) {
+        // Comparamos los puntajes.
+        // Si este ticket tiene 12 de prioridad y el otro tiene 8, devolverá un número positivo.
+        // Si tienen lo mismo, devolverá 0.
+        return Integer.compare(this.puntajePrioridad, otroTicket.getPuntajePrioridad());
     }
 }

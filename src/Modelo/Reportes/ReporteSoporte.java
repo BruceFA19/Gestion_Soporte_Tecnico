@@ -1,4 +1,4 @@
-package Modelo;
+package Modelo.Reportes;
 
 // importar  Estructuras.ListaEnlazada cuando se haga
 

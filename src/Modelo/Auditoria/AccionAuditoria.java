@@ -1,10 +1,5 @@
-package Modelo;
-
-
-
-
+package Modelo.Auditoria;
 // Aqui se hara REGISTRO de cada accion para la pila de auditoria (DESHACER)
-
 public class AccionAuditoria {
 
     private String tipoAccion;

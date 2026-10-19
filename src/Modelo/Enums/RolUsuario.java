@@ -1,7 +1,7 @@
-package Modelo.Users;
+package Modelo.Enums;
 
 public enum RolUsuario{
     SOLICITANTE,
-    TECNICO,
+    ASIGNATARIO,
     ADMINISTRADOR
 }

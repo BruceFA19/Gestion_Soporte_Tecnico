@@ -2,8 +2,8 @@ package Modelo.Tickets.Requerimiento;
 
 import Estructuras.ListaEnlazada;
 import Modelo.Tickets.Comentario;
-import Modelo.Tickets.Enums.EstadoTicket;
-import Modelo.Tickets.Enums.NivelPrioridad;
+import Modelo.Enums.EstadoTicket;
+import Modelo.Enums.NivelPrioridad;
 import Modelo.Tickets.Ticket;
 
 import java.time.LocalDateTime;

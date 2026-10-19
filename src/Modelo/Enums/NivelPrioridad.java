@@ -1,7 +1,5 @@
-package Modelo.Tickets.Enums;
-
+package Modelo.Enums;
 // NIVEL DE PRIORIDAD DE UN TICKET (1 a 4)
-
 public enum NivelPrioridad {
     BAJA(1),
     MEDIA(2),
