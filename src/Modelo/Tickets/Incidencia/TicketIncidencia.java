@@ -30,22 +30,20 @@ public class TicketIncidencia extends Ticket {
         this.calcularPrioridadAutomatica();
     }
     // CONSTRUCTOR 2: Para RECONSTRUIR incidencias (Desde el archivo txt)
-    public TicketIncidencia(String codigoTicket, String idSolicitante, String idTecnicoAsignado,
+    public TicketIncidencia(String codigoTicket, Solicitante solicitante, String idTecnicoAsignado,
                             String titulo, String descripcion, LocalDateTime fechaCreacion,
                             LocalDateTime fechaResolucion, LocalDateTime fechaLimiteResolucion,
                             EstadoTicket estado, NivelPrioridad nivelPrioridad,
                             ListaEnlazada<Comentario> historialComentarios,
                             String idEquipoAfectado, TipoProblema tipoProblema,
                             int alcanceUsuarios, int gradoBloqueo, int criticidadDepto) {
-        super(codigoTicket, idSolicitante, idTecnicoAsignado, titulo, descripcion,
+        super(codigoTicket, solicitante, idTecnicoAsignado, titulo, descripcion,
                 fechaCreacion, fechaResolucion, fechaLimiteResolucion, estado, nivelPrioridad, historialComentarios);
         this.idEquipoAfectado = idEquipoAfectado;
         this.tipoProblema = tipoProblema;
         this.alcanceUsuarios = alcanceUsuarios;
         this.gradoBloqueo = gradoBloqueo;
         this.criticidadDepartamento = criticidadDepto;
-        // Nota: Aquí NO llamamos a calcularPrioridadAutomatica() porque
-        // la prioridad y el SLA ya vienen calculados y recuperados del archivo txt.
     }
     @Override
     public long calcularTiempoEstimadoAtencion() {
