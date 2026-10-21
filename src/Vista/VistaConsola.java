@@ -1,6 +1,7 @@
 package Vista;
 import Controlador.GestorSoporteBancario;
 import Estructuras.ListaEnlazada;
+import Modelo.Enums.EstadoTicket;
 import Modelo.Enums.RolUsuario;
 import Modelo.Tickets.Incidencia.TicketIncidencia;
 import Modelo.Tickets.Incidencia.TipoProblema;
@@ -8,6 +9,9 @@ import Modelo.Tickets.Requerimiento.TicketRequerimiento;
 import Modelo.Tickets.Requerimiento.TipoServicio;
 import Modelo.Tickets.Ticket;
 import Modelo.Users.*;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 public class VistaConsola {
     private GestorSoporteBancario gestor;
@@ -73,7 +77,53 @@ public class VistaConsola {
     }
     //metodos de invocacion de menus
     private void mostrarMenuAsignatario(Asignatario asignatario) {
-        System.out.println("\n(Entrando al panel de Asignatario...)");
+        int opcion = 0;
+        do {
+            System.out.println("\n         PANEL DE ASIGNATARIO");
+            System.out.println("----------------------------------------------------");
+            System.out.println("1. Ver mi cola de tickets");
+            System.out.println("2. Atender siguiente ticket");
+            System.out.println("3. Resolver ticket en atención");
+            System.out.println("4. Ver detalle de un ticket");
+            System.out.println("5. Agregar comentario a un ticket");
+            System.out.println("6. Aprobar / Rechazar requerimientos");
+            System.out.println("7. Ver mi historial de tickets resueltos");
+            System.out.println("8. Cerrar Sesión");
+            System.out.print("Seleccione una opción: ");
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                opcion = 0;
+            }
+            switch (opcion) {
+                case 1:
+                    mostrarMiColaTickets();
+                    break;
+                case 2:
+                    atenderSiguienteTicket();
+                    break;
+                case 3:
+                    resolverTicketEnAtencion();
+                    break;
+                case 4:
+                    verDetalleTicket();
+                    break;
+                case 5:
+                    agregarComentarioTicket();
+                    break;
+                case 6:
+                    gestionarAprobacionRequerimientos();
+                    break;
+                case 7:
+                    mostrarMiHistorialResueltos();
+                    break;
+                case 8:
+                    System.out.println("Cerrando sesión de asignatario...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+            }
+        } while (opcion != 8);
         // Aquí pondremos las opciones de ver tickets, atender siguiente, etc.
     }
     private void mostrarMenuSolicitante(Solicitante solicitante) {
@@ -117,6 +167,7 @@ public class VistaConsola {
             }
         } while (opcion != 6);
     }
+    
     private void mostrarMenuAdministrador(Administrador administrador) {
         int opcion = 0;
         do {
@@ -376,7 +427,104 @@ public class VistaConsola {
         }
     }
     //Metodos para el menu asignatario
-
+    private void mostrarMiColaTickets() {
+        System.out.println("\n--- MI COLA DE TICKETS ---");
+        if (!(this.usuarioLogueado instanceof Asignatario)) {
+            System.out.println("Error: No hay una sesión de asignatario activa.");
+            return;
+        }
+ 
+        Asignatario tecnico = (Asignatario) this.usuarioLogueado;
+        ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
+        if (cola == null || cola.estaVacia()) {
+            System.out.println("No tienes tickets asignados en este momento.");
+            return;
+        }
+        int n = cola.getTamanio();
+        Ticket[] ordenados = new Ticket[n];
+        for (int i = 0; i < n; i++) {
+            ordenados[i] = cola.obtener(i);
+        }
+        for (int i = 1; i < n; i++) {
+            Ticket actual = ordenados[i];
+            int j = i - 1;
+            while (j >= 0 && tieneMasPrioridad(actual, ordenados[j])) {
+                ordenados[j + 1] = ordenados[j];
+                j--;
+            }
+            ordenados[j + 1] = actual;
+        }
+ 
+        System.out.printf("%-3s | %-10s | %-13s | %-25s | %-10s | %-8s | %-12s | %-12s\n",
+                "#", "CÓDIGO", "TIPO", "TÍTULO", "PRIORIDAD", "PUNTAJE", "ESTADO", "FECHA LÍMITE");
+        System.out.println("--------------------------------------------------------------------------------------------------------------");
+ 
+        for (int i = 0; i < n; i++) {
+            Ticket t = ordenados[i];
+            String tipo = (t instanceof TicketIncidencia) ? "Incidencia" : "Requerimiento";
+            System.out.printf("%-3d | %-10s | %-13s | %-25s | %-10s | %-8d | %-12s | %-12s\n",
+                    (i + 1),
+                    t.getCodigoTicket(),
+                    tipo,
+                    recortar(t.getTitulo(), 25),
+                    t.getNivelPrioridad(),
+                    t.getPuntajePrioridad(),
+                    t.getEstado(),
+                    formatearFecha(t.getFechaLimiteResolucion()));
+        }
+        System.out.println("\nTotal en cola: " + n);
+    }
+    private void atenderSiguienteTicket() {
+        System.out.println("\n--- ATENDER SIGUIENTE TICKET ---");
+        if (!(this.usuarioLogueado instanceof Asignatario)) {
+            System.out.println("Error: No hay una sesión de asignatario activa.");
+            return;
+        }
+ 
+        Asignatario tecnico = (Asignatario) this.usuarioLogueado;
+        ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
+        if (cola == null || cola.estaVacia()) {
+            System.out.println("No tienes tickets en tu cola.");
+            return;
+        }
+        Ticket siguiente = null;
+        for (int i = 0; i < cola.getTamanio(); i++) {
+            Ticket t = cola.obtener(i);
+            if (t.getEstado() == EstadoTicket.EN_PROGRESO) {
+                System.out.println("Ya estás atendiendo el ticket " + t.getCodigoTicket()
+                        + ". Resuélvelo antes de tomar otro.");
+                return;
+            }
+            if (t.getEstado() == EstadoTicket.ASIGNADO
+                    && (siguiente == null || tieneMasPrioridad(t, siguiente))) {
+                siguiente = t;
+            }
+        }
+ 
+        if (siguiente == null) {
+            System.out.println("No hay tickets pendientes por atender.");
+            return;
+        }
+ 
+        siguiente.cambiarEstado(EstadoTicket.EN_PROGRESO);
+ 
+        String solicitante = (siguiente.getSolicitante() != null)
+                ? siguiente.getSolicitante().getNombreCompleto()
+                : "Anónimo";
+        String tipo = (siguiente instanceof TicketIncidencia) ? "INCIDENCIA TÉCNICA" : "REQUERIMIENTO DE SERVICIO";
+ 
+        System.out.println("Has tomado el siguiente ticket:");
+        System.out.println("====================================================");
+        System.out.println(" CÓDIGO       : " + siguiente.getCodigoTicket());
+        System.out.println(" TIPO         : " + tipo);
+        System.out.println(" TÍTULO       : " + siguiente.getTitulo());
+        System.out.println(" DETALLE      : " + siguiente.getDescripcion());
+        System.out.println(" SOLICITANTE  : " + solicitante);
+        System.out.println(" PRIORIDAD    : " + siguiente.getNivelPrioridad()
+                + " (puntaje " + siguiente.getPuntajePrioridad() + ")");
+        System.out.println(" FECHA LÍMITE : " + formatearFecha(siguiente.getFechaLimiteResolucion()));
+        System.out.println("====================================================");
+    }
     //Metodos para el menu solicitante
     private void crearNuevoTicket() {
         int subOpcion = 0;
@@ -605,5 +753,22 @@ public class VistaConsola {
             }
             System.out.println("====================================================");
         }
+    }
+    //Metodos auxiliares
+     private String recortar(String texto, int max) {
+        if (texto == null) return "";
+        return (texto.length() <= max) ? texto : texto.substring(0, max - 3) + "...";
+    }
+    private boolean tieneMasPrioridad(Ticket a, Ticket b) {
+        if (a.getPuntajePrioridad() != b.getPuntajePrioridad()) {
+            return a.getPuntajePrioridad() > b.getPuntajePrioridad();
+        }
+        if (a.getFechaCreacion() == null || b.getFechaCreacion() == null) return false;
+        return a.getFechaCreacion().isBefore(b.getFechaCreacion());
+    }
+ 
+    private String formatearFecha(LocalDateTime fecha) {
+        if (fecha == null) return "N/A";
+        return fecha.format(DateTimeFormatter.ofPattern("dd/MM HH:mm"));
     }
 }
