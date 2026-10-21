@@ -29,7 +29,7 @@ public class GestorSoporteBancario {
         this.pilaAuditoria = new Pila<>();
         this.historialTicketsResueltos = new ListaEnlazada<>();
         this.contadorTickets = 1;
-        this.gestorPersistencia = new GestorPersistencia("data/usuarios.txt", "data/tickets.txt", "data/historial.txt");
+        this.gestorPersistencia = new GestorPersistencia();
     }
     /*
     public Ticket registrarLlegadaIncidencia(Solicitante solicitante, String idEquipo, TipoProblema problema,
