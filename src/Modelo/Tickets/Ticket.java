@@ -67,8 +67,8 @@ public abstract class Ticket implements Comparable<Ticket>, Serializable {
     public void setSolicitante(Solicitante solicitante) {
         this.solicitante = solicitante;
     }
-    public String getAsignatario() {
-        return asignatario.getNombreCompleto();
+    public Asignatario getAsignatario() {
+        return this.asignatario;
     }
     public void setAsignatario(Asignatario asignatario) {
         this.asignatario = asignatario;

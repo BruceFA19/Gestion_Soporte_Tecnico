@@ -9,7 +9,6 @@ import Modelo.Tickets.Requerimiento.TicketRequerimiento;
 import Modelo.Tickets.Requerimiento.TipoServicio;
 import Modelo.Tickets.Ticket;
 import Modelo.Users.*;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -51,6 +50,7 @@ public class VistaConsola {
             }
         } while (opcion != 2);
     }
+
     //Metodo de login
     private void procesarLogin() {
         System.out.println("\n--- INICIO DE SESIÓN ---");
@@ -75,6 +75,7 @@ public class VistaConsola {
             System.out.println("Tipo de usuario no reconocido por el menú.");
         }
     }
+
     //metodos de invocacion de menus
     private void mostrarMenuAsignatario(Asignatario asignatario) {
         int opcion = 0;
@@ -126,6 +127,7 @@ public class VistaConsola {
         } while (opcion != 8);
         // Aquí pondremos las opciones de ver tickets, atender siguiente, etc.
     }
+
     private void mostrarMenuSolicitante(Solicitante solicitante) {
         int opcion = 0;
         do {
@@ -167,7 +169,7 @@ public class VistaConsola {
             }
         } while (opcion != 6);
     }
-    
+
     private void mostrarMenuAdministrador(Administrador administrador) {
         int opcion = 0;
         do {
@@ -212,6 +214,7 @@ public class VistaConsola {
             }
         } while (opcion != 7);
     }
+
     //Metodos para el menu administrador
     private void crearNuevoUsuario() {
         System.out.println("\n--- 📝 REGISTRO DE NUEVO USUARIO ---");
@@ -270,6 +273,7 @@ public class VistaConsola {
             System.out.println("zAsignatario técnico registrado y activado para recibir tickets!");
         }
     }
+
     private void mostrarAsignatariosActivos() {
 
         System.out.println("\n--- 👥 LISTA DE ASIGNATARIOS TÉCNICOS ACTIVOS ---");
@@ -296,6 +300,7 @@ public class VistaConsola {
                     cantTickets);
         }
     }
+
     private void mostrarSolicitantesRegistrados() {
         System.out.println("\n---LISTA DE SOLICITANTES REGISTRADOS ---");
         ListaEnlazada<Solicitante> solicitantes = gestor.getSolicitantesRegistrados();
@@ -322,6 +327,7 @@ public class VistaConsola {
                     sol.getUsuarioRedBancaria());
         }
     }
+
     private void mostrarTicketsActivos() {
         System.out.println("\n---TICKETS ACTIVOS EN EL SISTEMA ---");
         ListaEnlazada<Ticket> tickets = gestor.getTicketsActivos();
@@ -359,6 +365,7 @@ public class VistaConsola {
                     detalleCat);
         }
     }
+
     private void mostrarTicketsResueltos() {
         System.out.println("\n--- ✅ HISTORIAL DE TICKETS RESUELTOS ---");
         ListaEnlazada<Ticket> resueltos = gestor.getHistorialTicketsResueltos();
@@ -383,6 +390,7 @@ public class VistaConsola {
                     "RESUELTO");
         }
     }
+
     private void eliminarUsuario() {
         System.out.println("\n---ELIMINAR USUARIO ---");
         System.out.print("Ingrese el ID o Usuario de Red de la cuenta a eliminar: ");
@@ -404,6 +412,7 @@ public class VistaConsola {
             System.out.println("Operación cancelada.");
         }
     }
+
     private void mostrarOpcionesListas() {
         System.out.println("\n--- 📜 SUBMENÚ: CONSULTA DE LISTAS ---");
         System.out.println("1. Ver lista de Asignatarios activos");
@@ -426,6 +435,7 @@ public class VistaConsola {
                 break;
         }
     }
+
     //Metodos para el menu asignatario
     private void mostrarMiColaTickets() {
         System.out.println("\n--- MI COLA DE TICKETS ---");
@@ -433,7 +443,7 @@ public class VistaConsola {
             System.out.println("Error: No hay una sesión de asignatario activa.");
             return;
         }
- 
+
         Asignatario tecnico = (Asignatario) this.usuarioLogueado;
         ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
         if (cola == null || cola.estaVacia()) {
@@ -454,11 +464,11 @@ public class VistaConsola {
             }
             ordenados[j + 1] = actual;
         }
- 
+
         System.out.printf("%-3s | %-10s | %-13s | %-25s | %-10s | %-8s | %-12s | %-12s\n",
                 "#", "CÓDIGO", "TIPO", "TÍTULO", "PRIORIDAD", "PUNTAJE", "ESTADO", "FECHA LÍMITE");
         System.out.println("--------------------------------------------------------------------------------------------------------------");
- 
+
         for (int i = 0; i < n; i++) {
             Ticket t = ordenados[i];
             String tipo = (t instanceof TicketIncidencia) ? "Incidencia" : "Requerimiento";
@@ -474,13 +484,14 @@ public class VistaConsola {
         }
         System.out.println("\nTotal en cola: " + n);
     }
+
     private void atenderSiguienteTicket() {
         System.out.println("\n--- ATENDER SIGUIENTE TICKET ---");
         if (!(this.usuarioLogueado instanceof Asignatario)) {
             System.out.println("Error: No hay una sesión de asignatario activa.");
             return;
         }
- 
+
         Asignatario tecnico = (Asignatario) this.usuarioLogueado;
         ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
         if (cola == null || cola.estaVacia()) {
@@ -500,19 +511,19 @@ public class VistaConsola {
                 siguiente = t;
             }
         }
- 
+
         if (siguiente == null) {
             System.out.println("No hay tickets pendientes por atender.");
             return;
         }
- 
+
         siguiente.cambiarEstado(EstadoTicket.EN_PROGRESO);
- 
+
         String solicitante = (siguiente.getSolicitante() != null)
                 ? siguiente.getSolicitante().getNombreCompleto()
                 : "Anónimo";
         String tipo = (siguiente instanceof TicketIncidencia) ? "INCIDENCIA TÉCNICA" : "REQUERIMIENTO DE SERVICIO";
- 
+
         System.out.println("Has tomado el siguiente ticket:");
         System.out.println("====================================================");
         System.out.println(" CÓDIGO       : " + siguiente.getCodigoTicket());
@@ -525,6 +536,7 @@ public class VistaConsola {
         System.out.println(" FECHA LÍMITE : " + formatearFecha(siguiente.getFechaLimiteResolucion()));
         System.out.println("====================================================");
     }
+
     //Metodos para el menu solicitante
     private void crearNuevoTicket() {
         int subOpcion = 0;
@@ -553,12 +565,15 @@ public class VistaConsola {
                 break;
         }
     }
+
     private void registrarIncidencia() {
         System.out.println("\n---REGISTRAR INCIDENCIA ---");
         //idEquipo
         System.out.print("Ingrese el id del equipo: ");
         String idEquipo = scanner.nextLine().trim();
-        if (idEquipo.isEmpty()) idEquipo = "N/A";
+        if (idEquipo.isEmpty()) {
+            idEquipo = "N/A";
+        }
         //titulo del ticket
         System.out.print("Ingrese un título breve del problema: ");
         String titulo = scanner.nextLine().trim();
@@ -641,6 +656,7 @@ public class VistaConsola {
             System.out.println("Error al registrar la incidencia.");
         }
     }
+
     private void registrarRequerimiento() {
         System.out.println("\n---SOLICITAR REQUERIMIENTO ---");
         System.out.print("Ingrese el título del requerimiento: ");
@@ -695,6 +711,7 @@ public class VistaConsola {
             System.out.println("Error al registrar el requerimiento.");
         }
     }
+
     private int leerOpcionRango(int min, int max) {
         int valor = min;
         try {
@@ -709,6 +726,7 @@ public class VistaConsola {
         }
         return valor;
     }
+
     private void mostrarMisTicketsActivos() {
         System.out.println("\n--- MIS TICKETS ACTIVOS ---");
         if (this.usuarioLogueado == null) {
@@ -754,21 +772,137 @@ public class VistaConsola {
             System.out.println("====================================================");
         }
     }
+
+    private void mostrarMisTicketsResueltos() {
+        System.out.println("\n---HISTORIAL DE MIS TICKETS RESUELTOS ---");
+        if (this.usuarioLogueado == null) {
+            System.out.println("Error: No hay una sesión activa.");
+            return;
+        }
+        ListaEnlazada<Ticket> resueltos = gestor.obtenerTicketsResueltosPorSolicitante(
+                this.usuarioLogueado.getIdUsuario()
+        );
+        if (resueltos.estaVacia()) {
+            System.out.println("No tienes solicitudes en tu historial de resueltos.");
+            return;
+        }
+        System.out.println("Se encontraron " + resueltos.getTamanio() + " ticket(s) en tu historial:\n");
+        for (int i = 0; i < resueltos.getTamanio(); i++) {
+            Ticket t = resueltos.obtener(i);
+
+            System.out.println("====================================================");
+            System.out.println(" CÓDIGO      : " + t.getCodigoTicket());
+            System.out.println(" TÍTULO      : " + t.getTitulo());
+            System.out.println(" DETALLE     : " + t.getDescripcion());
+            System.out.println(" ESTADO      : " + t.getEstado()); // RESUELTO / CERRADO
+
+            if (t.getAsignatario() != null) {
+                System.out.println("ATENDIDO POR: " + t.getAsignatario().getNombreCompleto());
+            }
+
+            if (t instanceof TicketIncidencia) {
+                TicketIncidencia inc = (TicketIncidencia) t;
+                System.out.println(" TIPO        : INCIDENCIA TÉCNICA");
+                System.out.println(" EQUIPO      : " + inc.getIdEquipoAfectado());
+                if (inc.getTipoProblema() != null) {
+                    System.out.println("CATEGORÍA   : " + inc.getTipoProblema().getCodigoCategoria());
+                }
+            } else if (t instanceof TicketRequerimiento) {
+                TicketRequerimiento req = (TicketRequerimiento) t;
+                System.out.println(" TIPO        : REQUERIMIENTO DE SERVICIO");
+                if (req.getTipoServicio() != null) {
+                    System.out.println("SERVICIO    : " + req.getTipoServicio().getNombreServicio());
+                }
+            }
+            System.out.println("====================================================");
+        }
+    }
+
+    private void cancelarTicketPendiente() {
+        System.out.println("\n---CANCELAR TICKET PENDIENTE ---");
+        if (this.usuarioLogueado == null) {
+            System.out.println("Error: No hay una sesión activa.");
+            return;
+        }
+        // Mostramos primero los tickets activos para ayudar al usuario a ver sus códigos
+        mostrarMisTicketsActivos();
+        System.out.print("\nIngrese el CÓDIGO del ticket que desea cancelar (ej: TCK-001) o '0' para salir: ");
+        String codigoTicket = scanner.nextLine().trim();
+        if (codigoTicket.equals("0") || codigoTicket.isEmpty()) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
+        int resultado = gestor.cancelarTicketPendiente(codigoTicket, this.usuarioLogueado.getIdUsuario());
+        switch (resultado) {
+            case 1:
+                System.out.println("El ticket " + codigoTicket.toUpperCase() + " ha sido cancelado exitosamente.");
+                break;
+            case -1:
+                System.out.println("No se puede cancelar el ticket " + codigoTicket.toUpperCase()
+                        + " porque ya fue asignado a un técnico y está 'EN ATENCIÓN'.");
+                break;
+            case -2:
+                System.out.println("Acceso denegado: El ticket " + codigoTicket.toUpperCase()
+                        + " fue creado por otro usuario.");
+                break;
+            default:
+                System.out.println("No se encontró ningún ticket con el código '" + codigoTicket + "' en la cola de espera.");
+                break;
+        }
+    }
+
+    private void mostrarMiPerfil() {
+        System.out.println("\n--- 👤 MI PERFIL DE SOLICITANTE ---");
+
+        if (this.usuarioLogueado == null) {
+            System.out.println("⚠️ Error: No hay una sesión activa.");
+            return;
+        }
+
+        // Casteo seguro de la sesión actual al tipo Solicitante
+        Solicitante solicitante = (Solicitante) this.usuarioLogueado;
+
+        System.out.println("====================================================");
+        System.out.println("ID USUARIO    : " + solicitante.getIdUsuario());
+        System.out.println("NOMBRE        : " + solicitante.getNombreCompleto());
+        System.out.println("CÉDULA        : " + solicitante.getCedula());
+        //System.out.println("CORREO        : " + solicitante.getCorreoElectronico());
+
+        // Información referencial del Departamento
+        if (solicitante.getDepartamento() != null) {
+            Departamento depto = solicitante.getDepartamento();
+            System.out.println("DEPARTAMENTO  : " + depto.getNombreArea()
+                    + " [" + depto.getIdDepartamento() + "]");
+            System.out.println("CRITICIDAD    : Nivel " + depto.getCriticidadDepartamento()
+                    + " (Impacta en la prioridad de incidencias)");
+        } else {
+            System.out.println("DEPARTAMENTO  : Sin departamento asignado");
+        }
+        System.out.println("====================================================");
+    }
+
     //Metodos auxiliares
-     private String recortar(String texto, int max) {
-        if (texto == null) return "";
+    private String recortar(String texto, int max) {
+        if (texto == null) {
+            return "";
+        }
         return (texto.length() <= max) ? texto : texto.substring(0, max - 3) + "...";
     }
+
     private boolean tieneMasPrioridad(Ticket a, Ticket b) {
         if (a.getPuntajePrioridad() != b.getPuntajePrioridad()) {
             return a.getPuntajePrioridad() > b.getPuntajePrioridad();
         }
-        if (a.getFechaCreacion() == null || b.getFechaCreacion() == null) return false;
+        if (a.getFechaCreacion() == null || b.getFechaCreacion() == null) {
+            return false;
+        }
         return a.getFechaCreacion().isBefore(b.getFechaCreacion());
     }
- 
+
     private String formatearFecha(LocalDateTime fecha) {
-        if (fecha == null) return "N/A";
+        if (fecha == null) {
+            return "N/A";
+        }
         return fecha.format(DateTimeFormatter.ofPattern("dd/MM HH:mm"));
     }
 }

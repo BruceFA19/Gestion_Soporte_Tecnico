@@ -121,7 +121,6 @@ public class GestorSoporteBancario {
     }
     public ListaEnlazada<Solicitante> getSolicitantesRegistrados() {
         ListaEnlazada<Solicitante> solicitantes = new ListaEnlazada<>();
-
         // Obtenemos todos los usuarios almacenados en la Tabla Hash
         // (Asegúrate de que tu TablaHash tenga un método para obtener sus valores,
         //  o un método obtenerValores() que devuelva una ListaEnlazada<Usuario>)
@@ -253,5 +252,57 @@ public class GestorSoporteBancario {
         }
 
         return ticketsActivos;
+    }
+    public ListaEnlazada<Ticket> obtenerTicketsResueltosPorSolicitante(String idSolicitante) {
+        ListaEnlazada<Ticket> misResueltos = new ListaEnlazada<>();
+        if (idSolicitante == null || idSolicitante.isEmpty() || historialTicketsResueltos == null) {
+            return misResueltos;
+        }
+        // Recorremos la lista global de historial de tickets resueltos
+        for (int i = 0; i < historialTicketsResueltos.getTamanio(); i++) {
+            Ticket t = historialTicketsResueltos.obtener(i);
+            if (t.getSolicitante() != null && t.getSolicitante().getIdUsuario().equals(idSolicitante)) {
+                misResueltos.agregar(t);
+            }
+        }
+        return misResueltos;
+    }
+    public int cancelarTicketPendiente(String codigoTicket, String idSolicitante) {
+        if (codigoTicket == null || codigoTicket.isEmpty() || colaEsperaGlobal == null) {
+            return 0;
+        }
+        ListaEnlazada<Ticket> listaEspera = colaEsperaGlobal.toListaEnlazada();
+        int posicionEncontrada = -1;
+        Ticket ticketAAnular = null;
+        for (int i = 0; i < listaEspera.getTamanio(); i++) {
+            Ticket t = listaEspera.obtener(i);
+            if (t.getCodigoTicket().equalsIgnoreCase(codigoTicket.trim())) {
+                posicionEncontrada = i;
+                ticketAAnular = t;
+                break;
+            }
+        }
+        if (posicionEncontrada == -1) {
+            if (asignatariosActivos != null) {
+                for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+                    Asignatario tec = asignatariosActivos.obtener(i);
+                    ListaEnlazada<Ticket> listaTecnico = tec.getTicketeraPersonal();
+                    for (int j = 0; j < listaTecnico.getTamanio(); j++) {
+                        if (listaTecnico.obtener(j).getCodigoTicket().equalsIgnoreCase(codigoTicket.trim())) {
+                            return -1; // El ticket ya está EN_ATENCION y no se puede cancelar directamente
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+        // 2. Validar que el ticket pertenezca al solicitante logueado
+        if (!ticketAAnular.getSolicitante().getIdUsuario().equals(idSolicitante)) {
+            return -2; // No tiene permisos para anular este ticket
+        }
+        // 3. Eliminación de la cola global de espera
+        listaEspera.eliminarEnPosicion(posicionEncontrada);
+        ticketAAnular.setEstado(EstadoTicket.CANCELADO);
+        return 1;
     }
 }

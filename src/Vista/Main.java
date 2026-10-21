@@ -14,14 +14,12 @@ public class Main {
         VistaConsola vista = new VistaConsola(gestor);
         vista.iniciar();
     }
-
-    //metodo de carga de datos de prueba OJO borrar en futuro SOLO PRUEBA
     public static void cargarSeed(GestorSoporteBancario gestor){
         //Seed
         System.out.println("Cargando base de datos en memoria...");
+        
         Departamento deptoCajas = new Departamento("DEP-001","Cajas",1);
         Departamento deptoRRHH = new Departamento("DEP-002","Recursos Humanos",3);
-
         Solicitante empleado1 = new Solicitante(
                 "EMP-001", "Ana", "Rojas", "0701234567", "arojas", "1234", RolUsuario.SOLICITANTE, deptoCajas
         );

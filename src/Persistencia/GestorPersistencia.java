@@ -1,46 +1,43 @@
 package Persistencia;
-
-import Estructuras.ColaPrioridad;
-import Estructuras.TablaHash;
-import Estructuras.ListaEnlazada;
-import Modelo.Tickets.Ticket;
-import Modelo.Users.Usuario;
-
-//Guarda y carga usuarios, tickets en archivos
-
+import Controlador.GestorSoporteBancario;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 public class GestorPersistencia {
-
-    private String rutaArchivoUsuarios;
-    private String rutaArchivoTickets;
-    private String rutaArchivoHistorial;
-
-    public GestorPersistencia(String rutaArchivoUsuarios, String rutaArchivoTickets, String rutaArchivoHistorial) {
-        this.rutaArchivoUsuarios = rutaArchivoUsuarios;
-        this.rutaArchivoTickets = rutaArchivoTickets;
-        this.rutaArchivoHistorial = rutaArchivoHistorial;
+private static final String RUTA_ARCHIVO = "datos_sistema.dat";
+    public static boolean guardarEstado(GestorSoporteBancario gestor) {
+        if (gestor == null) {
+            return false;
+        }
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(RUTA_ARCHIVO))) {
+            oos.writeObject(gestor);
+            System.out.println("Datos guardados correctamente en " + RUTA_ARCHIVO);
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error al guardar los datos del sistema: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
+    public static GestorSoporteBancario cargarEstado() {
+        File archivo = new File(RUTA_ARCHIVO);
 
-    public boolean guardarUsuariosEnArchivo(TablaHash<String, Usuario> usuarios) {
-        // TODO
-        return false;
+        // Si el archivo no existe (primera ejecución), se retorna un Gestor nuevo
+        if (!archivo.exists()) {
+            System.out.println("ℹ️ No se encontró archivo de datos previo. Creando un sistema nuevo...");
+            return new GestorSoporteBancario();
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
+            GestorSoporteBancario gestorCargado = (GestorSoporteBancario) ois.readObject();
+            System.out.println("📂 Datos cargados exitosamente desde " + RUTA_ARCHIVO);
+            return gestorCargado;
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("⚠️ Error al deserializar el archivo. Se creará una instancia limpia: " + e.getMessage());
+            return new GestorSoporteBancario();
+        }
     }
-
-    public TablaHash<String, Usuario> cargarUsuariosDesdeArchivo() {
-        // TODO
-        return null;
-    }
-
-    public boolean guardarTicketsEnArchivo(ColaPrioridad<Ticket> cola, ListaEnlazada<Ticket> historico) {
-        // TODO
-        return false;
-    }
-
-    public ListaEnlazada<Ticket> cargarTicketsDesdeArchivo() {
-        // TODO
-        return null;
-    }
-
-    public String getRutaArchivoUsuarios() { return rutaArchivoUsuarios; }
-    public String getRutaArchivoTickets() { return rutaArchivoTickets; }
-    public String getRutaArchivoHistorial() { return rutaArchivoHistorial; }
 }
