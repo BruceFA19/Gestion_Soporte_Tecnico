@@ -5,16 +5,17 @@ import Modelo.Tickets.Comentario;
 import Modelo.Enums.EstadoTicket;
 import Modelo.Enums.NivelPrioridad;
 import Modelo.Tickets.Ticket;
+import Modelo.Users.Asignatario;
 import Modelo.Users.Solicitante;
 
 import java.time.LocalDateTime;
 
 public class TicketIncidencia extends Ticket {
     private static final long serialVersionUID = 1L;
-    private String idEquipoAfectado; // Ej: "PC-CAJA-03" o "SRV-BASE-DATOS"
-    private TipoProblema tipoProblema;   // Ej: "REDES", "HARDWARE", "SOFTWARE"
-    private int alcanceUsuarios;     // 1: Individual, 2: Grupal, 3: Masivo
-    private int gradoBloqueo;        // 1: Bajo, 2: Medio, 3: Alto
+    private String idEquipoAfectado;
+    private TipoProblema tipoProblema;
+    private int alcanceUsuarios;
+    private int gradoBloqueo;
     private int criticidadDepartamento;
     private int puntajeTotalPrioridad;
     // CONSTRUCTOR 1: Para crear incidencias NUEVAS (Desde el menú)
@@ -29,15 +30,14 @@ public class TicketIncidencia extends Ticket {
         this.criticidadDepartamento = criticidadDepto;
         this.calcularPrioridadAutomatica();
     }
-    // CONSTRUCTOR 2: Para RECONSTRUIR incidencias (Desde el archivo txt)
-    public TicketIncidencia(String codigoTicket, Solicitante solicitante, String idTecnicoAsignado,
+    public TicketIncidencia(String codigoTicket, Solicitante solicitante, Asignatario asignatario,
                             String titulo, String descripcion, LocalDateTime fechaCreacion,
                             LocalDateTime fechaResolucion, LocalDateTime fechaLimiteResolucion,
                             EstadoTicket estado, NivelPrioridad nivelPrioridad,
                             ListaEnlazada<Comentario> historialComentarios,
                             String idEquipoAfectado, TipoProblema tipoProblema,
                             int alcanceUsuarios, int gradoBloqueo, int criticidadDepto) {
-        super(codigoTicket, solicitante, idTecnicoAsignado, titulo, descripcion,
+        super(codigoTicket, solicitante, asignatario, titulo, descripcion,
                 fechaCreacion, fechaResolucion, fechaLimiteResolucion, estado, nivelPrioridad, historialComentarios);
         this.idEquipoAfectado = idEquipoAfectado;
         this.tipoProblema = tipoProblema;
@@ -58,7 +58,6 @@ public class TicketIncidencia extends Ticket {
                 + this.gradoBloqueo
                 + this.criticidadDepartamento
                 + this.tipoProblema.getNivelComplejidadBase();
-
         if (this.puntajeTotalPrioridad >= 10) {
             this.nivelPrioridad = NivelPrioridad.CRITICA;
         } else if (this.puntajeTotalPrioridad >= 7) {

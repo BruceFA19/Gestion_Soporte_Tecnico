@@ -10,11 +10,8 @@ import Modelo.Users.Solicitante;
 public class Main {
     static void main() {
         GestorSoporteBancario gestor = new GestorSoporteBancario();
-
         cargarSeed(gestor);
-
         VistaConsola vista = new VistaConsola(gestor);
-
         vista.iniciar();
     }
 
@@ -42,14 +39,13 @@ public class Main {
         Administrador admin1 = new Administrador(
                 "ADM-001", "Roberto", "Gerente", "0709998887", "rgerente", "1234", RolUsuario.ADMINISTRADOR
         );
+        //carga de seed de usuarios
         gestor.registrarUsuario(empleado1);
         gestor.registrarUsuario(empleado2);
-
         gestor.registrarUsuario(tecnico1);
         gestor.registrarUsuario(tecnico2);
-
         gestor.registrarUsuario(admin1);
-
+        //carga de asignatarios acitvos
         gestor.registrarAsignatarioActivo(tecnico1);
         gestor.registrarAsignatarioActivo(tecnico2);
     }

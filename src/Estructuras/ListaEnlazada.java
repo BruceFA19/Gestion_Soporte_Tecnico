@@ -110,8 +110,6 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
             }
         };
     }
-    public ListaEnlazada<T> toListaEnlazada() {
-    }
     public boolean eliminarEnPosicion(int indice) {
         if (indice < 0 || indice >= tamanio || cabeza == null) {
             return false;

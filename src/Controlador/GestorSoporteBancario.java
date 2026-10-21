@@ -1,11 +1,10 @@
 package Controlador;
-
-
 import Estructuras.ColaPrioridad;
 import Estructuras.ListaEnlazada;
 import Estructuras.Pila;
 import Estructuras.TablaHash;
 import Modelo.Auditoria.AccionAuditoria;
+import Modelo.Enums.EstadoTicket;
 import Modelo.Tickets.Incidencia.TicketIncidencia;
 import Modelo.Tickets.Incidencia.TipoProblema;
 import Modelo.Tickets.Ticket;
@@ -13,7 +12,6 @@ import Modelo.Users.Asignatario;
 import Modelo.Users.Solicitante;
 import Modelo.Users.Usuario;
 import Persistencia.GestorPersistencia;
-
 public class GestorSoporteBancario {
     private ColaPrioridad<Ticket> colaEsperaGlobal;
     private ListaEnlazada<Ticket> historialTicketsResueltos;
@@ -22,6 +20,7 @@ public class GestorSoporteBancario {
     private Pila<AccionAuditoria> pilaAuditoria;
     private GestorPersistencia gestorPersistencia;
     private ListaEnlazada<Asignatario> asignatariosActivos = new ListaEnlazada<>();
+    private int contadorTickets;
 
     public GestorSoporteBancario() {
         this.colaEsperaGlobal = new ColaPrioridad<>();
@@ -29,6 +28,7 @@ public class GestorSoporteBancario {
         this.historicoTickets = new ListaEnlazada<>();
         this.pilaAuditoria = new Pila<>();
         this.historialTicketsResueltos = new ListaEnlazada<>();
+        this.contadorTickets = 1;
         this.gestorPersistencia = new GestorPersistencia("data/usuarios.txt", "data/tickets.txt", "data/historial.txt");
     }
     /*
@@ -91,14 +91,10 @@ public class GestorSoporteBancario {
         usuariosRegistrados.insertar(nuevoUsuario.getIdUsuario(), nuevoUsuario);
     }
     public Usuario validarAcceso(String idUsuario, String contrasena) {
-        // La Tabla Hash busca al usuario instantáneamente
         Usuario usuario = usuariosRegistrados.obtener(idUsuario);
-
-        // Si el usuario existe y la contraseña es correcta
         if (usuario != null && usuario.getContraseniaHash().equals(contrasena)) {
             return usuario;
         }
-
         return null;
     }
     public Ticket buscarTicketPorCodigo(String codigoTicket) {
@@ -157,7 +153,7 @@ public class GestorSoporteBancario {
                 Asignatario tec = asignatariosActivos.obtener(i);
 
                 if (tec.getTicketeraPersonal() != null) {
-                    ListaEnlazada<Ticket> ticketsTecnico = tec.getTicketeraPersonal().toListaEnlazada();
+                    ListaEnlazada<Ticket> ticketsTecnico = tec.getTicketeraPersonal();
                     for (int j = 0; j < ticketsTecnico.getTamanio(); j++) {
                         ticketsActivos.agregar(ticketsTecnico.obtener(j));
                     }
@@ -192,5 +188,70 @@ public class GestorSoporteBancario {
                 break;
             }
         }
+    }
+    public String generarNuevoIdTicket() {
+        String idTicket = String.format("TCK-%03d", contadorTickets);
+        contadorTickets++;
+        return idTicket;
+    }
+    public boolean registrarYAsignarTicket(Ticket nuevoTicket) {
+        if (nuevoTicket == null) {
+            return false;
+        }
+        if (asignatariosActivos != null && !asignatariosActivos.estaVacia()) {
+            Asignatario tecnicoMenosCargado = null;
+            int menorCargaTickets = Integer.MAX_VALUE;
+            for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+                Asignatario tec = asignatariosActivos.obtener(i);
+                int cargaActual = tec.getTicketeraPersonal().getTamanio();
+                if (cargaActual < menorCargaTickets) {
+                    menorCargaTickets = cargaActual;
+                    tecnicoMenosCargado = tec;
+                }
+            }
+            if (tecnicoMenosCargado != null) {
+                nuevoTicket.asignarTecnico(tecnicoMenosCargado);
+                nuevoTicket.setEstado(EstadoTicket.EN_PROGRESO);
+                tecnicoMenosCargado.getTicketeraPersonal().agregar(nuevoTicket);
+                System.out.println("🤖 Ticket asignado automáticamente al técnico: "
+                        + tecnicoMenosCargado.getNombreCompleto());
+                return true;
+            }
+        }
+        nuevoTicket.setEstado(EstadoTicket.EN_ESPERA_USUARIO);
+        colaEsperaGlobal.encolar(nuevoTicket);
+        System.out.println("No hay técnicos activos disponibles. Ticket ingresado a la Cola de Espera Global.");
+        return true;
+    }
+    public ListaEnlazada<Ticket> obtenerTicketsActivosPorSolicitante(String idSolicitante) {
+        ListaEnlazada<Ticket> ticketsActivos = new ListaEnlazada<>();
+        if (idSolicitante == null || idSolicitante.isEmpty()) {
+            return ticketsActivos;
+        }
+        if (colaEsperaGlobal != null) {
+            ListaEnlazada<Ticket> listaGlobal = colaEsperaGlobal.toListaEnlazada();
+            for (int i = 0; i < listaGlobal.getTamanio(); i++) {
+                Ticket t = listaGlobal.obtener(i);
+                if (t.getSolicitante() != null && t.getSolicitante().getIdUsuario().equals(idSolicitante)) {
+                    ticketsActivos.agregar(t);
+                }
+            }
+        }
+        if (asignatariosActivos != null) {
+            for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+                Asignatario tec = asignatariosActivos.obtener(i);
+                if (tec.getTicketeraPersonal() != null) {
+                    ListaEnlazada<Ticket> listaTecnico = tec.getTicketeraPersonal().toListaEnlazada();
+                    for (int j = 0; j < listaTecnico.getTamanio(); j++) {
+                        Ticket t = listaTecnico.obtener(j);
+                        if (t.getSolicitante() != null && t.getSolicitante().getIdUsuario().equals(idSolicitante)) {
+                            ticketsActivos.agregar(t);
+                        }
+                    }
+                }
+            }
+        }
+
+        return ticketsActivos;
     }
 }

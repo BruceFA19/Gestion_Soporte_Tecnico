@@ -3,7 +3,9 @@ import Controlador.GestorSoporteBancario;
 import Estructuras.ListaEnlazada;
 import Modelo.Enums.RolUsuario;
 import Modelo.Tickets.Incidencia.TicketIncidencia;
+import Modelo.Tickets.Incidencia.TipoProblema;
 import Modelo.Tickets.Requerimiento.TicketRequerimiento;
+import Modelo.Tickets.Requerimiento.TipoServicio;
 import Modelo.Tickets.Ticket;
 import Modelo.Users.*;
 import java.util.Scanner;
@@ -32,7 +34,6 @@ public class VistaConsola {
             } catch (NumberFormatException e) {
                 opcion = 0;
             }
-
             //en caso e meter opcion numerica no valida
             switch (opcion) {
                 case 1:
@@ -54,12 +55,12 @@ public class VistaConsola {
         System.out.print("Ingrese su Contraseña: ");
         String pass = scanner.nextLine();
         Usuario usuarioAutenticado = gestor.validarAcceso(id, pass);
-        if (usuarioLogueado == null) {
+        if (usuarioAutenticado == null) {
             System.out.println("Credenciales incorrectas o usuario no encontrado.");
             return;
         }
-        System.out.println("¡Bienvenido, " + usuarioLogueado.getNombreCompleto() + "!");
         this.usuarioLogueado = usuarioAutenticado;
+        System.out.println("¡Bienvenido, " + usuarioLogueado.getNombreCompleto() + "!");
         if (usuarioLogueado instanceof Asignatario) {
             mostrarMenuAsignatario((Asignatario) usuarioLogueado);
         } else if (usuarioLogueado instanceof Solicitante) {
@@ -76,8 +77,45 @@ public class VistaConsola {
         // Aquí pondremos las opciones de ver tickets, atender siguiente, etc.
     }
     private void mostrarMenuSolicitante(Solicitante solicitante) {
-        System.out.println("\n(Entrando al panel de Solicitante...)");
-        // Aquí pondremos la opción de crear ticket, ver mis reportes, etc.
+        int opcion = 0;
+        do {
+            System.out.println("\n         PANEL DE SOLICITANTE");
+            System.out.println("----------------------------------------------------");
+            System.out.println("1. Crear nuevo ticket (Incidencia / Requerimiento)");
+            System.out.println("2. Ver estado de mis tickets activos");
+            System.out.println("3. Ver historial de mis tickets resueltos");
+            System.out.println("4. Cancelar un ticket pendiente");
+            System.out.println("5. Ver mi perfil y departamento");
+            System.out.println("6. Cerrar Sesión");
+            System.out.print("Seleccione una opción: ");
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                opcion = 0;
+            }
+            switch (opcion) {
+                case 1:
+                    crearNuevoTicket();
+                    break;
+                case 2:
+                    mostrarMisTicketsActivos();
+                    break;
+                case 3:
+                    mostrarMisTicketsResueltos();
+                    break;
+                case 4:
+                    cancelarTicketPendiente();
+                    break;
+                case 5:
+                    mostrarMiPerfil();
+                    break;
+                case 6:
+                    System.out.println("Cerrando sesión de solicitante...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+            }
+        } while (opcion != 6);
     }
     private void mostrarMenuAdministrador(Administrador administrador) {
         int opcion = 0;
@@ -338,5 +376,234 @@ public class VistaConsola {
         }
     }
     //Metodos para el menu asignatario
+
     //Metodos para el menu solicitante
+    private void crearNuevoTicket() {
+        int subOpcion = 0;
+        System.out.println("\n---CREAR NUEVO TICKET ---");
+        System.out.println("1. Reportar Incidencia (Falla técnica, error de sistema, equipo dañado)");
+        System.out.println("2. Solicitar Requerimiento (Acceso a sistemas, nuevo equipo, insumos)");
+        System.out.println("0. Volver al menú de solicitante");
+        System.out.print("Seleccione el tipo de ticket: ");
+        try {
+            subOpcion = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            subOpcion = 0;
+        }
+        switch (subOpcion) {
+            case 1:
+                registrarIncidencia();
+                break;
+            case 2:
+                registrarRequerimiento();
+                break;
+            case 0:
+                System.out.println("ℹ️ Operación cancelada. Regresando...");
+                break;
+            default:
+                System.out.println("⚠️ Opción no válida.");
+                break;
+        }
+    }
+    private void registrarIncidencia() {
+        System.out.println("\n---REGISTRAR INCIDENCIA ---");
+        //idEquipo
+        System.out.print("Ingrese el id del equipo: ");
+        String idEquipo = scanner.nextLine().trim();
+        if (idEquipo.isEmpty()) idEquipo = "N/A";
+        //titulo del ticket
+        System.out.print("Ingrese un título breve del problema: ");
+        String titulo = scanner.nextLine().trim();
+        //descripcion del ticket
+        System.out.print("Ingrese la descripción detallada de la falla: ");
+        String descripcion = scanner.nextLine().trim();
+        //aseguramos que el ticket contenga titulo y descripcion
+        if (titulo.isEmpty() || descripcion.isEmpty()) {
+            System.out.println("El título y la descripción son obligatorios.");
+            return;
+        }
+        //alcance de la afectacion
+        System.out.println("\n¿A cuántos usuarios o puestos afecta la falla?");
+        System.out.println("1. Solo a mí (Alcance Individual - 1)");
+        System.out.println("2. A mi departamento/área (Alcance Grupal - 2)");
+        System.out.println("3. A toda la agencia / red bancaria (Alcance Masivo - 3)");
+        System.out.print("Seleccione alcance (1-3): ");
+        int alcance = leerOpcionRango(1, 3);
+        //Bloqueo de la afectacion
+        System.out.println("\n¿Qué tanto interrumpe su trabajo diario?");
+        System.out.println("1. Leve (Puedo seguir trabajando en otras tareas - 1)");
+        System.out.println("2. Moderado (Trabajo parcialmente detenido - 2)");
+        System.out.println("3. Total (Imposible trabajar / Operación paralizada - 3)");
+        System.out.print("Seleccione nivel de bloqueo (1-3): ");
+        int bloqueo = leerOpcionRango(1, 3);
+        //categoria del problema
+        System.out.println("\nSeleccione la categoría del problema:");
+        System.out.println("1. Falla de Hardware (Impresora, Monitor, Lector Biométrico)");
+        System.out.println("2. Falla de Software (Sistema de caja, Core Bancario, Correo)");
+        System.out.println("3. Conectividad / Red (Sin internet, VPN caída)");
+        System.out.print("Opción: ");
+        int catOp = 0;
+        try {
+            catOp = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            catOp = 1;
+        }
+        TipoProblema tipoProblema;
+        switch (catOp) {
+            case 1:
+                tipoProblema = new TipoProblema("CAT-HW", "Falla de Hardware", 24);
+                break;
+            case 2:
+                tipoProblema = new TipoProblema("CAT-SW", "Falla de Software", 12);
+                break;
+            case 3:
+                tipoProblema = new TipoProblema("CAT-RED", "Conectividad/Red", 6);
+                break;
+            default:
+                tipoProblema = new TipoProblema("CAT-GEN", "Falla General", 48);
+                break;
+        }
+        //buscamos el solicitante
+        Solicitante solicitanteActual = (Solicitante) this.usuarioLogueado;
+        //agregamos id al ticket
+        String idTicket = gestor.generarNuevoIdTicket();
+        //buscamos grado ed criticidad
+        int criticidadDepto = 2;
+        if (solicitanteActual.getDepartamento() != null) {
+            criticidadDepto = solicitanteActual.getDepartamento().getCriticidadDepartamento();
+        } else {
+            System.out.print("Ingrese la criticidad operativa de su área (1: Baja, 2: Media, 3: Alta): ");
+            criticidadDepto = leerOpcionRango(1, 3);
+        }
+        TicketIncidencia nuevaIncidencia = new TicketIncidencia(
+                idTicket,
+                solicitanteActual,
+                titulo,
+                descripcion,
+                idEquipo,
+                tipoProblema,
+                alcance,
+                bloqueo,
+                criticidadDepto
+        );
+        boolean exito = gestor.registrarYAsignarTicket(nuevaIncidencia);
+        if (exito) {
+            System.out.println("Incidencia registrada con éxito. CÓDIGO: " + idTicket);
+        } else {
+            System.out.println("Error al registrar la incidencia.");
+        }
+    }
+    private void registrarRequerimiento() {
+        System.out.println("\n---SOLICITAR REQUERIMIENTO ---");
+        System.out.print("Ingrese el título del requerimiento: ");
+        String titulo = scanner.nextLine().trim();
+        System.out.print("Ingrese los detalles de la solicitud: ");
+        String descripcion = scanner.nextLine().trim();
+        if (titulo.isEmpty() || descripcion.isEmpty()) {
+            System.out.println("Todos los campos son obligatorios.");
+            return;
+        }
+        System.out.println("\nSeleccione el tipo de servicio requerido:");
+        System.out.println("1. Creación / Modificación de Permisos en Sistemas");
+        System.out.println("2. Solicitud de Insumos o Consumibles (Tóner, Papel)");
+        System.out.println("3. Asignación de Periféricos o Mobiliario");
+        System.out.print("Opción: ");
+        int catOp = 0;
+        try {
+            catOp = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            catOp = 1;
+        }
+        TipoServicio tipoServicio;
+        int prioridad = 1;
+        switch (catOp) {
+            case 1:
+                tipoServicio = new TipoServicio("SERV-001", "Permisos de Acceso a Sistemas", true, 24);
+                break;
+            case 2:
+                tipoServicio = new TipoServicio("SERV-002", "Suministros e Insumos de Oficina", false, 48);
+                break;
+            case 3:
+                tipoServicio = new TipoServicio("SERV-003", "Asignación de Equipamiento de Cómputo", true, 72);
+                break;
+            default:
+                tipoServicio = new TipoServicio("SERV-GEN", "Solicitud de Servicio General", false, 48);
+                break;
+        }
+        Solicitante solicitanteActual = (Solicitante) this.usuarioLogueado;
+        String idTicket = gestor.generarNuevoIdTicket();
+        // Instanciación de Requerimiento
+        TicketRequerimiento nuevoRequerimiento = new TicketRequerimiento(
+                idTicket,
+                solicitanteActual,
+                titulo,
+                descripcion,
+                tipoServicio
+        );
+        boolean exito = gestor.registrarYAsignarTicket(nuevoRequerimiento);
+        if (exito) {
+            System.out.println("Requerimiento registrado con éxito. CÓDIGO: " + idTicket);
+        } else {
+            System.out.println("Error al registrar el requerimiento.");
+        }
+    }
+    private int leerOpcionRango(int min, int max) {
+        int valor = min;
+        try {
+            valor = Integer.parseInt(scanner.nextLine().trim());
+            if (valor < min || valor > max) {
+                System.out.println("Opción fuera de rango. Se asignará por defecto: " + min);
+                valor = min;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Entrada inválida. Se asignará por defecto: " + min);
+            valor = min;
+        }
+        return valor;
+    }
+    private void mostrarMisTicketsActivos() {
+        System.out.println("\n--- MIS TICKETS ACTIVOS ---");
+        if (this.usuarioLogueado == null) {
+            System.out.println("Error: No hay una sesión activa.");
+            return;
+        }
+        ListaEnlazada<Ticket> misTickets = gestor.obtenerTicketsActivosPorSolicitante(
+                this.usuarioLogueado.getIdUsuario()
+        );
+        if (misTickets.estaVacia()) {
+            System.out.println("No tienes tickets pendientes o en atención actualmente.");
+            return;
+        }
+        System.out.println("Se encontraron " + misTickets.getTamanio() + " ticket(s) activo(s):\n");
+        for (int i = 0; i < misTickets.getTamanio(); i++) {
+            Ticket t = misTickets.obtener(i);
+            System.out.println("====================================================");
+            System.out.println(" CÓDIGO    : " + t.getCodigoTicket());
+            System.out.println(" TÍTULO    : " + t.getTitulo());
+            System.out.println(" DETALLE   : " + t.getDescripcion());
+            System.out.println(" PRIORIDAD : " + t.getNivelPrioridad());
+            System.out.println(" ESTADO    : " + t.getEstado());
+            if (t.getAsignatario() != null) {
+                System.out.println(" TÉCNICO   : " + t.getAsignatario());
+            } else {
+                System.out.println(" TÉCNICO   : Sin asignar (En Cola de Espera Global)");
+            }
+            if (t instanceof TicketIncidencia) {
+                TicketIncidencia inc = (TicketIncidencia) t;
+                System.out.println(" TIPO      : INCIDENCIA TÉCNICA");
+                System.out.println(" EQUIPO    : " + inc.getIdEquipoAfectado());
+                if (inc.getTipoProblema() != null) {
+                    System.out.println("CATEGORÍA : " + inc.getTipoProblema().getCodigoCategoria());
+                }
+            } else if (t instanceof TicketRequerimiento) {
+                TicketRequerimiento req = (TicketRequerimiento) t;
+                System.out.println(" TIPO      : REQUERIMIENTO DE SERVICIO");
+                if (req.getTipoServicio() != null) {
+                    System.out.println("SERVICIO  : " + req.getTipoServicio().getNombreServicio());
+                }
+                System.out.println("APROBADO  : " + (req.isEstaAprobado() ? "SÍ" : "PENDIENTE DE REVISIÓN"));
+            }
+            System.out.println("====================================================");
+        }
+    }
 }

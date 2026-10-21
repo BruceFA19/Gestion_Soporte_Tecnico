@@ -18,4 +18,5 @@ public class Solicitante extends Usuario {
     public Departamento getDepartamento() {
         return departamento;
     }
+
 }

@@ -4,6 +4,7 @@ import Modelo.Tickets.Comentario;
 import Modelo.Enums.EstadoTicket;
 import Modelo.Enums.NivelPrioridad;
 import Modelo.Tickets.Ticket;
+import Modelo.Users.Asignatario;
 import Modelo.Users.Solicitante;
 import java.time.LocalDateTime;
 public class TicketRequerimiento extends Ticket {
@@ -18,13 +19,13 @@ public class TicketRequerimiento extends Ticket {
         this.estaAprobado = !tipoServicio.isRequiereAprobacion();
         this.calcularPrioridadAutomatica();
     }
-    public TicketRequerimiento(String codigoTicket, Solicitante idSolicitante, String idTecnicoAsignado,
+    public TicketRequerimiento(String codigoTicket, Solicitante idSolicitante, Asignatario asignatario,
                                String titulo, String descripcion, LocalDateTime fechaCreacion,
                                LocalDateTime fechaResolucion, LocalDateTime fechaLimiteResolucion,
                                EstadoTicket estado, NivelPrioridad nivelPrioridad,
                                ListaEnlazada<Comentario> historialComentarios,
                                TipoServicio tipoServicio, boolean estaAprobado) {
-        super(codigoTicket, idSolicitante, idTecnicoAsignado, titulo, descripcion,
+        super(codigoTicket, idSolicitante, asignatario, titulo, descripcion,
                 fechaCreacion, fechaResolucion, fechaLimiteResolucion, estado, nivelPrioridad, historialComentarios);
         this.tipoServicio = tipoServicio;
         this.estaAprobado = estaAprobado;
