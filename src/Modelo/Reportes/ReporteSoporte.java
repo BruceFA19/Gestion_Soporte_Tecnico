@@ -5,12 +5,13 @@ package Modelo.Reportes;
 import Estructuras.ListaEnlazada;
 import Modelo.Tickets.Ticket;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 // Reporte con estadisticas de desempeño del soporte
 
-public class ReporteSoporte {
-
+public class ReporteSoporte implements Serializable {
+    private static final long serialVersionUID = 1L;
     private LocalDateTime fechaReporte;
     private int totalTicketsAtendidos;
     private double tiempoPromedioEspera;

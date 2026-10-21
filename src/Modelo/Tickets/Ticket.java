@@ -3,54 +3,42 @@ package Modelo.Tickets;
 import Estructuras.ListaEnlazada;
 import Modelo.Enums.EstadoTicket;
 import Modelo.Enums.NivelPrioridad;
+import Modelo.Users.Solicitante;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public abstract class Ticket implements Comparable<Ticket> {
-    // 1. Identificadores Básicos (Usamos Strings para la persistencia en archivos)
-    protected String codigoTicket;       // Ej: "TIC-1001"
-    protected String idSolicitante;      // ID del usuario que crea el ticket
-    protected String idTecnicoAsignado;  // Inicia vacío hasta que un técnico lo toma
-
-    // 2. Textos Descriptivos (Añadidos para el enfoque tipo Jira)
+public abstract class Ticket implements Comparable<Ticket>, Serializable {
+    private static final long serialVersionUID = 1L;
+    protected String codigoTicket;
+    protected Solicitante solicitante;
+    protected String idTecnicoAsignado;
     protected String titulo;
     protected String descripcion;
-
-    // 3. Tiempos
     protected LocalDateTime fechaCreacion;
-    protected LocalDateTime fechaResolucion; // Inicia nulo, se llena al cerrar
-
-    // 4. Estados y Prioridad
+    protected LocalDateTime fechaResolucion;
     protected EstadoTicket estado;
     protected NivelPrioridad nivelPrioridad;
-
-    // 5. Comunicación Asíncrona
     protected ListaEnlazada<Comentario> historialComentarios;
-
-    protected LocalDateTime fechaLimiteResolucion; // El famoso SLA
-
+    protected LocalDateTime fechaLimiteResolucion;
     protected int puntajePrioridad;
-
-    public Ticket(String codigoTicket, String idSolicitante, String titulo, String descripcion) {
+    public Ticket(String codigoTicket, Solicitante solicitante, String titulo, String descripcion) {
         this.codigoTicket = codigoTicket;
-        this.idSolicitante = idSolicitante;
+        this.solicitante = solicitante;
         this.titulo = titulo;
         this.descripcion = descripcion;
-
-        // Autogenerados
         this.idTecnicoAsignado = "SIN_ASIGNAR";
         this.fechaCreacion = LocalDateTime.now();
         this.estado = EstadoTicket.ABIERTO;
         this.historialComentarios = new ListaEnlazada<>();
     }
-
-    public Ticket(String codigoTicket, String idSolicitante, String idTecnicoAsignado, String titulo,
+    public Ticket(String codigoTicket, Solicitante solicitante, String idTecnicoAsignado, String titulo,
                   String descripcion, LocalDateTime fechaCreacion, LocalDateTime fechaResolucion,
-                  LocalDateTime fechaLimiteResolucion, // ¡Aquí está el SLA recuperado!
+                  LocalDateTime fechaLimiteResolucion,
                   EstadoTicket estado, NivelPrioridad nivelPrioridad, ListaEnlazada<Comentario> historialComentarios) {
 
         this.codigoTicket = codigoTicket;
-        this.idSolicitante = idSolicitante;
+        this.solicitante = solicitante;
         this.idTecnicoAsignado = idTecnicoAsignado;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -61,16 +49,12 @@ public abstract class Ticket implements Comparable<Ticket> {
         this.nivelPrioridad = nivelPrioridad;
         this.historialComentarios = historialComentarios;
     }
-
     public abstract void calcularPrioridadAutomatica();
-
     public abstract long calcularTiempoEstimadoAtencion();
-
     public void asignarTecnico(String idTecnico) {
         this.idTecnicoAsignado = idTecnico;
         this.estado = EstadoTicket.ASIGNADO;
     }
-
     public void cambiarEstado(EstadoTicket nuevoEstado) {
         this.estado = nuevoEstado;
         if (nuevoEstado == EstadoTicket.RESUELTO || nuevoEstado == EstadoTicket.CERRADO) {
@@ -78,34 +62,99 @@ public abstract class Ticket implements Comparable<Ticket> {
         }
     }
 
-    public String getCodigoTicket() {
-        return codigoTicket;
+    public void setCodigoTicket(String codigoTicket) {
+        this.codigoTicket = codigoTicket;
     }
 
-    public String getSolicitante() {
-        return idSolicitante;
+    public void setSolicitante(Solicitante solicitante) {
+        this.solicitante = solicitante;
     }
 
-    public String getTecnicoAsignado() {
+    public String getIdTecnicoAsignado() {
         return idTecnicoAsignado;
     }
 
+    public void setIdTecnicoAsignado(String idTecnicoAsignado) {
+        this.idTecnicoAsignado = idTecnicoAsignado;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public LocalDateTime getFechaResolucion() {
+        return fechaResolucion;
+    }
+
+    public void setFechaResolucion(LocalDateTime fechaResolucion) {
+        this.fechaResolucion = fechaResolucion;
+    }
+
+    public void setEstado(EstadoTicket estado) {
+        this.estado = estado;
+    }
+
+    public void setNivelPrioridad(NivelPrioridad nivelPrioridad) {
+        this.nivelPrioridad = nivelPrioridad;
+    }
+
+    public ListaEnlazada<Comentario> getHistorialComentarios() {
+        return historialComentarios;
+    }
+
+    public void setHistorialComentarios(ListaEnlazada<Comentario> historialComentarios) {
+        this.historialComentarios = historialComentarios;
+    }
+
+    public LocalDateTime getFechaLimiteResolucion() {
+        return fechaLimiteResolucion;
+    }
+
+    public void setFechaLimiteResolucion(LocalDateTime fechaLimiteResolucion) {
+        this.fechaLimiteResolucion = fechaLimiteResolucion;
+    }
+
+    public void setPuntajePrioridad(int puntajePrioridad) {
+        this.puntajePrioridad = puntajePrioridad;
+    }
+
+    public String getCodigoTicket() {
+        return codigoTicket;
+    }
+    public Solicitante getSolicitante() {
+        return solicitante;
+    }
+    public String getTecnicoAsignado() {
+        return idTecnicoAsignado;
+    }
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
-
     public EstadoTicket getEstado() {
         return estado;
     }
-
     public NivelPrioridad getNivelPrioridad() {
         return nivelPrioridad;
     }
-
     public int getPuntajePrioridad() {
         return puntajePrioridad;
     }
-
     @Override
     public int compareTo(Ticket otroTicket) {
         // Comparamos los puntajes.

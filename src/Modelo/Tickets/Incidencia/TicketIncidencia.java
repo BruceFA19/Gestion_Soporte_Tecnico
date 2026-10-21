@@ -9,6 +9,7 @@ import Modelo.Tickets.Ticket;
 import java.time.LocalDateTime;
 
 public class TicketIncidencia extends Ticket {
+    private static final long serialVersionUID = 1L;
     private String idEquipoAfectado; // Ej: "PC-CAJA-03" o "SRV-BASE-DATOS"
     private TipoProblema tipoProblema;   // Ej: "REDES", "HARDWARE", "SOFTWARE"
     private int alcanceUsuarios;     // 1: Individual, 2: Grupal, 3: Masivo

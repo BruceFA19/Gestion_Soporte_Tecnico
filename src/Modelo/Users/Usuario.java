@@ -1,9 +1,10 @@
 package Modelo.Users;
 import Modelo.Enums.RolUsuario;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-public abstract class Usuario {
+public abstract class Usuario implements Serializable {
     protected String idUsuario;
     protected String nombre;
     protected String apellido;

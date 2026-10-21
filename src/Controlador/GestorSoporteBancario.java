@@ -15,24 +15,22 @@ import Modelo.Users.Usuario;
 import Persistencia.GestorPersistencia;
 
 public class GestorSoporteBancario {
-
-    // TUS ESTRUCTURAS DE DATOS (El núcleo de tu calificación)
     private ColaPrioridad<Ticket> colaEsperaGlobal;
+    private ListaEnlazada<Ticket> historialTicketsResueltos;
     private TablaHash<String, Usuario> usuariosRegistrados;
     private ListaEnlazada<Ticket> historicoTickets;
     private Pila<AccionAuditoria> pilaAuditoria;
     private GestorPersistencia gestorPersistencia;
-    ListaEnlazada<Asignatario> asignatariosActivos = new ListaEnlazada<>();
+    private ListaEnlazada<Asignatario> asignatariosActivos = new ListaEnlazada<>();
 
     public GestorSoporteBancario() {
         this.colaEsperaGlobal = new ColaPrioridad<>();
         this.usuariosRegistrados = new TablaHash<>();
         this.historicoTickets = new ListaEnlazada<>();
         this.pilaAuditoria = new Pila<>();
-        // El evaluador de prioridad fue eliminado, el ticket se calcula solo.
+        this.historialTicketsResueltos = new ListaEnlazada<>();
         this.gestorPersistencia = new GestorPersistencia("data/usuarios.txt", "data/tickets.txt", "data/historial.txt");
     }
-
     public Ticket registrarLlegadaIncidencia(Solicitante solicitante, String idEquipo, TipoProblema problema,
                                              int alcanceUsuarios, int gradoBloqueo) {
         // 1. Creamos el ticket. ¡Él mismo calcula su prioridad internamente!
@@ -60,81 +58,137 @@ public class GestorSoporteBancario {
 
         return nuevoTicket;
     }
-
+    public ListaEnlazada<Ticket> getHistorialTicketsResueltos() {
+        return historialTicketsResueltos;
+    }
     public void asignarTicketAutomaticamente(Ticket nuevoTicket) {
-        // Si no hay nadie trabajando, el sistema explota (o lo guardamos en la cola central como respaldo)
         if (asignatariosActivos.estaVacia()) {
-            System.out.println("ALERTA: No hay asignatarios activos. El ticket irá a la sala de espera.");
-            // ¡Lo guardamos en la cola global! (Sigue ordenándose por prioridad automáticamente)
             colaEsperaGlobal.encolar(nuevoTicket);
-            // Registramos en auditoría que quedó en espera
-            AccionAuditoria accion = new AccionAuditoria("EN_ESPERA", nuevoTicket.getCodigoTicket(),
-                    "Ticket en cola central por falta de personal");
-            pilaAuditoria.apilar(accion);
-            return; // Terminamos la ejecución para que no intente asignarlo a nadie
+            System.out.println("No hay técnicos disponibles. Ticket enviado a Cola Global de Espera.");
+            return;
         }
-        Asignatario mejorAsignatario = null;
+        Asignatario tecnicoMenosCargado = null;
+        int menorCarga = Integer.MAX_VALUE;
+        for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+            Asignatario tec = asignatariosActivos.obtener(i);
+            int cargaActual = tec.getTicketeraPersonal().getTamanio();
 
-        int menorCargaDeTrabajo = Integer.MAX_VALUE;
-
-        for (Asignatario assig : asignatariosActivos) {
-            if (assig.getCantidadTicketsPendientes() < menorCargaDeTrabajo) {
-                mejorAsignatario = assig;
-                menorCargaDeTrabajo = assig.getCantidadTicketsPendientes();
+            if (cargaActual < menorCarga) {
+                menorCarga = cargaActual;
+                tecnicoMenosCargado = tec;
             }
         }
-        if (mejorAsignatario != null) {
-            // Le inyectamos el ticket directamente a su ticketera personal
-            mejorAsignatario.recibirTicketAsignado(nuevoTicket);
+        if (tecnicoMenosCargado != null) {
+            tecnicoMenosCargado.getTicketeraPersonal().agregar(nuevoTicket);
             System.out.println("Ticket " + nuevoTicket.getCodigoTicket() +
-                    " asignado automáticamente a: " + mejorAsignatario.getNombreCompleto());
-
-            // Opcional: Registrar en la auditoría
-            AccionAuditoria accion = new AccionAuditoria("ASIGNACION_AUTO", nuevoTicket.getCodigoTicket(),
-                    "Asignado a " + mejorAsignatario.getNombreCompleto());
-            pilaAuditoria.apilar(accion);
+                    " asignado automáticamente a " + tecnicoMenosCargado.getNombreCompleto());
         }
     }
-
     public void registrarUsuario(Usuario nuevoUsuario) {
         // Usamos el ID del usuario como clave (Ej: "E-100") y el objeto completo como valor
         usuariosRegistrados.insertar(nuevoUsuario.getIdUsuario(), nuevoUsuario);
     }
-
     public Usuario validarAcceso(String idUsuario, String contrasena) {
         // La Tabla Hash busca al usuario instantáneamente
         Usuario usuario = usuariosRegistrados.obtener(idUsuario);
 
         // Si el usuario existe y la contraseña es correcta
         if (usuario != null && usuario.getContraseniaHash().equals(contrasena)) {
-            return usuario; // Login exitoso
+            return usuario;
         }
 
-        return null; // Login fallido (no existe o clave incorrecta)
+        return null;
     }
-
     public Ticket buscarTicketPorCodigo(String codigoTicket) {
         // TODO: Buscar en colaTurnosPendientes y en historicoTickets.
         return null;
     }
-
     public boolean deshacerUltimaAccion() {
         // TODO: Sacar la ultima AccionAuditoria de pilaAuditoria y revertirla.
         return false;
     }
-
     public void registrarAsignatarioActivo(Asignatario asignatario) {
-        // Asumiendo que tu lista se llama asignatariosActivos
         asignatariosActivos.agregar(asignatario);
     }
-
     /*public boolean guardarEstadoSistema() {
         return gestorPersistencia.guardarUsuariosEnArchivo(listaUsuarios)
                 && gestorPersistencia.guardarTicketsEnArchivo(colaEsperaGlobal, historicoTickets);
     }*/
-
     public boolean cargarEstadoSistema() {
         // TODO: Cargar usuarios y tickets con gestorPersistencia y reconstruir la cola y el historico.
         return false;
+    }
+    public ListaEnlazada<Asignatario> getAsignatariosActivos() {
+        return asignatariosActivos;
+    }
+    public ListaEnlazada<Solicitante> getSolicitantesRegistrados() {
+        ListaEnlazada<Solicitante> solicitantes = new ListaEnlazada<>();
+
+        // Obtenemos todos los usuarios almacenados en la Tabla Hash
+        // (Asegúrate de que tu TablaHash tenga un método para obtener sus valores,
+        //  o un método obtenerValores() que devuelva una ListaEnlazada<Usuario>)
+        ListaEnlazada<Usuario> todosLosUsuarios = usuariosRegistrados.obtenerValores();
+
+        if (todosLosUsuarios != null) {
+            for (int i = 0; i < todosLosUsuarios.getTamanio(); i++) {
+                Usuario u = todosLosUsuarios.obtener(i);
+
+                // Filtramos usando polimorfismo/instanceof
+                if (u instanceof Solicitante) {
+                    solicitantes.agregar((Solicitante) u);
+                }
+            }
+        }
+
+        return solicitantes;
+    }
+    public ListaEnlazada<Ticket> getTicketsActivos() {
+        ListaEnlazada<Ticket> ticketsActivos = new ListaEnlazada<>();
+        if (colaEsperaGlobal != null) {
+            ListaEnlazada<Ticket> globales = colaEsperaGlobal.toListaEnlazada();
+            for (int i = 0; i < globales.getTamanio(); i++) {
+                ticketsActivos.agregar(globales.obtener(i));
+            }
+        }
+        if (asignatariosActivos != null) {
+            for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+                Asignatario tec = asignatariosActivos.obtener(i);
+
+                if (tec.getTicketeraPersonal() != null) {
+                    ListaEnlazada<Ticket> ticketsTecnico = tec.getTicketeraPersonal().toListaEnlazada();
+                    for (int j = 0; j < ticketsTecnico.getTamanio(); j++) {
+                        ticketsActivos.agregar(ticketsTecnico.obtener(j));
+                    }
+                }
+            }
+        }
+        return ticketsActivos;
+    }
+    public boolean eliminarUsuario(String idOUsuarioRed, String usuarioLogueado) {
+        if (idOUsuarioRed.equalsIgnoreCase(usuarioLogueado)) {
+            System.out.println("No puedes eliminar tu propia cuenta mientras estás en sesión.");
+            return false;
+        }
+        Usuario usuarioAEliminar = usuariosRegistrados.obtener(idOUsuarioRed);
+        if (usuarioAEliminar == null) {
+            return false;
+        }
+        if (usuarioAEliminar instanceof Asignatario) {
+            Asignatario asig = (Asignatario) usuarioAEliminar;
+            if (asig.getTicketeraPersonal() != null && !asig.getTicketeraPersonal().estaVacia()) {
+                System.out.println("⚠️ No se puede eliminar: El técnico tiene tickets pendientes en su cola.");
+                return false;
+            }
+            removerAsignatarioActivo(asig);
+        }
+        return usuariosRegistrados.eliminar(idOUsuarioRed);
+    }
+    private void removerAsignatarioActivo(Asignatario asig) {
+        for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
+            if (asignatariosActivos.obtener(i).getIdUsuario().equals(asig.getIdUsuario())) {
+                asignatariosActivos.eliminarEnPosicion(i);
+                break;
+            }
+        }
     }
 }

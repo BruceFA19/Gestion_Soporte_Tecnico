@@ -1,6 +1,9 @@
 package Estructuras;
-public class Pila<T> {
 
+import java.io.Serializable;
+
+public class Pila<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Nodo<T> cima; // El "plato" que está hasta arriba
     private int tamanio;
 

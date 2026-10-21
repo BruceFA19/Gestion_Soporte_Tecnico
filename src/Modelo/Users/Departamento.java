@@ -27,4 +27,5 @@ public class Departamento {
     public void setCriticidadDepartamento(int criticidadDepartamento) {
         this.criticidadDepartamento = criticidadDepartamento;
     }
+
 }

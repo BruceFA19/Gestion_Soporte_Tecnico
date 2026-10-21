@@ -1,6 +1,9 @@
 package Estructuras;
 
-public class Nodo<T> {
+import java.io.Serializable;
+
+public class Nodo<T> implements Serializable {
+    private static final long serialVersionUID = 1L;
     private T dato;
     private Nodo<T> siguiente;
     public Nodo(T dato) {

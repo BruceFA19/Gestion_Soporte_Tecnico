@@ -1,6 +1,8 @@
 package Estructuras;
+import java.io.Serializable;
 import java.util.Iterator;
-public class ListaEnlazada<T> implements Iterable<T> {
+public class ListaEnlazada<T> implements Iterable<T>, Serializable {
+    private static final long serialVersionUID = 1L;
     private Nodo<T> cabeza; // El primer elemento de la lista
     private Nodo<T> cola;   // El último elemento (nos ahorra recorrer toda la lista para agregar)
     private int tamanio;    // Contador rápido de elementos
@@ -107,5 +109,25 @@ public class ListaEnlazada<T> implements Iterable<T> {
                 return dato;
             }
         };
+    }
+    public ListaEnlazada<T> toListaEnlazada() {
+    }
+    public boolean eliminarEnPosicion(int indice) {
+        if (indice < 0 || indice >= tamanio || cabeza == null) {
+            return false;
+        }
+        if (indice == 0) {
+            cabeza = cabeza.getSiguiente();
+            tamanio--;
+            return true;
+        }
+        Nodo<T> actual = cabeza;
+        for (int i = 0; i < indice - 1; i++) {
+            actual = actual.getSiguiente();
+        }
+        Nodo<T> nodoAEliminar = actual.getSiguiente();
+        actual.setSiguiente(nodoAEliminar.getSiguiente());
+        tamanio--;
+        return true;
     }
 }

@@ -2,13 +2,13 @@ package Estructuras;
 
 // A quien le toque manipular esta parte, reemplazar nomas los valores para loque vaya hacer esta estructura
 
-public class TablaHash<K, V> {
+import java.io.Serializable;
 
-    // Un arreglo estático de Nodos Hash
+public class TablaHash<K, V> implements Serializable {
+    private static final long serialVersionUID = 1L;
     private NodoHash<K, V>[] arreglo;
     private int capacidad;
     private int tamanio;
-
     @SuppressWarnings("unchecked")
     public TablaHash(int capacidadInicial) {
         this.capacidad = capacidadInicial;
@@ -16,25 +16,12 @@ public class TablaHash<K, V> {
         // En Java, crear arreglos de genéricos requiere este casteo
         this.arreglo = (NodoHash<K, V>[]) new NodoHash[capacidad];
     }
-
-    // Constructor por defecto (crea una tabla de 100 espacios)
     public TablaHash() {
         this(100);
     }
-
-    // ==========================================
-    // FUNCIÓN HASH (El motor matemático)
-    // ==========================================
     private int calcularIndice(K clave) {
-        // Obtenemos el código hash nativo, quitamos el signo negativo (abs)
-        // y usamos el módulo (%) para que encaje en el tamaño del arreglo
         return Math.abs(clave.hashCode() % capacidad);
     }
-
-    // ==========================================
-    // OPERACIONES BÁSICAS
-    // ==========================================
-
     public void insertar(K clave, V valor) {
         int indice = calcularIndice(clave);
         NodoHash<K, V> nuevoNodo = new NodoHash<>(clave, valor);
@@ -62,7 +49,6 @@ public class TablaHash<K, V> {
             }
         }
     }
-
     public V obtener(K clave) {
         int indice = calcularIndice(clave);
         NodoHash<K, V> actual = arreglo[indice];
@@ -77,30 +63,41 @@ public class TablaHash<K, V> {
 
         return null; // El usuario no existe
     }
-
-    public void eliminar(K clave) {
+    public boolean eliminar(K clave) {
         int indice = calcularIndice(clave);
         NodoHash<K, V> actual = arreglo[indice];
         NodoHash<K, V> anterior = null;
-
         while (actual != null) {
             if (actual.clave.equals(clave)) {
                 if (anterior == null) {
-                    // Era el primer elemento de la cubeta
                     arreglo[indice] = actual.siguiente;
                 } else {
-                    // Estaba en medio de una cadena de colisión
                     anterior.siguiente = actual.siguiente;
                 }
                 tamanio--;
-                return;
+                return true;
             }
             anterior = actual;
             actual = actual.siguiente;
         }
+        return false;
     }
-
     public int getTamanio() {
         return tamanio;
+    }
+    public ListaEnlazada<V> obtenerValores() {
+        ListaEnlazada<V> listaValores = new ListaEnlazada<>();
+        if (arreglo == null || tamanio == 0) {
+            return listaValores;
+        }
+        for (int i = 0; i < arreglo.length; i++) {
+            NodoHash<K, V> actual = arreglo[i];
+
+            while (actual != null) {
+                listaValores.agregar(actual.getValor());
+                actual = actual.getSiguiente();
+            }
+        }
+        return listaValores;
     }
 }
