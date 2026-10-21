@@ -5,6 +5,7 @@ import Modelo.Tickets.Comentario;
 import Modelo.Enums.EstadoTicket;
 import Modelo.Enums.NivelPrioridad;
 import Modelo.Tickets.Ticket;
+import Modelo.Users.Solicitante;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +18,10 @@ public class TicketIncidencia extends Ticket {
     private int criticidadDepartamento;
     private int puntajeTotalPrioridad;
     // CONSTRUCTOR 1: Para crear incidencias NUEVAS (Desde el menú)
-    public TicketIncidencia(String codigoTicket, String idSolicitante, String titulo,
+    public TicketIncidencia(String codigoTicket, Solicitante solicitante, String titulo,
                             String descripcion, String idEquipo, TipoProblema tipoProblema,
                             int alcance, int bloqueo, int criticidadDepto) {
-        super(codigoTicket, idSolicitante, titulo, descripcion);
+        super(codigoTicket, solicitante, titulo, descripcion);
         this.idEquipoAfectado = idEquipo;
         this.tipoProblema = tipoProblema;
         this.alcanceUsuarios = alcance;

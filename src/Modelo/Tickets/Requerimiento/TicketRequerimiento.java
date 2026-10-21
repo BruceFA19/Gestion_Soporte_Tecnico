@@ -11,9 +11,9 @@ public class TicketRequerimiento extends Ticket {
     private TipoServicio tipoServicio;
     private boolean requiereAprobacion;
     private boolean estaAprobado;
-    public TicketRequerimiento(String codigoTicket, Solicitante idSolicitante, String titulo,
+    public TicketRequerimiento(String codigoTicket, Solicitante solicitante, String titulo,
                                String descripcion, TipoServicio tipoServicio) {
-        super(codigoTicket, idSolicitante, titulo, descripcion);
+        super(codigoTicket, solicitante, titulo, descripcion);
         this.tipoServicio = tipoServicio;
         this.estaAprobado = !tipoServicio.isRequiereAprobacion();
         this.calcularPrioridadAutomatica();

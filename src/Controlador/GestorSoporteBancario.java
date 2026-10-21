@@ -31,6 +31,7 @@ public class GestorSoporteBancario {
         this.historialTicketsResueltos = new ListaEnlazada<>();
         this.gestorPersistencia = new GestorPersistencia("data/usuarios.txt", "data/tickets.txt", "data/historial.txt");
     }
+    /*
     public Ticket registrarLlegadaIncidencia(Solicitante solicitante, String idEquipo, TipoProblema problema,
                                              int alcanceUsuarios, int gradoBloqueo) {
         // 1. Creamos el ticket. ¡Él mismo calcula su prioridad internamente!
@@ -58,6 +59,7 @@ public class GestorSoporteBancario {
 
         return nuevoTicket;
     }
+    */
     public ListaEnlazada<Ticket> getHistorialTicketsResueltos() {
         return historialTicketsResueltos;
     }
