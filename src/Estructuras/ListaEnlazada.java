@@ -3,9 +3,9 @@ import java.io.Serializable;
 import java.util.Iterator;
 public class ListaEnlazada<T> implements Iterable<T>, Serializable {
     private static final long serialVersionUID = 1L;
-    private Nodo<T> cabeza; // El primer elemento de la lista
-    private Nodo<T> cola;   // El último elemento (nos ahorra recorrer toda la lista para agregar)
-    private int tamanio;    // Contador rápido de elementos
+    private Nodo<T> cabeza;
+    private Nodo<T> cola;
+    private int tamanio;
     public ListaEnlazada() {
         this.cabeza = null;
         this.cola = null;
@@ -127,5 +127,8 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
         actual.setSiguiente(nodoAEliminar.getSiguiente());
         tamanio--;
         return true;
+    }
+    public Nodo<T> getCabeza() {
+        return this.cabeza;
     }
 }

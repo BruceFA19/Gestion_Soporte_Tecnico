@@ -10,6 +10,8 @@ import Modelo.Tickets.Requerimiento.TipoServicio;
 import Modelo.Tickets.Ticket;
 import Modelo.Tickets.Comentario;
 import Modelo.Users.*;
+import Persistencia.GestorPersistencia;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -172,7 +174,7 @@ public class VistaConsola {
     private void mostrarMenuAdministrador(Administrador administrador) {
         int opcion = 0;
         do {
-            System.out.println("         PANEL DE ADMINISTRADOR");
+            System.out.println("\n            PANEL DE ADMINISTRADOR");
             System.out.println("----------------------------------------------------");
             System.out.println("1. Agregar nuevo usuario (Solicitante/Asignatario)");
             System.out.println("2. Ver listas (Lista de Solicitantes/Asignatario)");
@@ -215,112 +217,114 @@ public class VistaConsola {
     }
     //Metodos para el menu administrador
     private void crearNuevoUsuario() {
-        System.out.println("\n--- 📝 REGISTRO DE NUEVO USUARIO ---");
+        System.out.println("\n---REGISTRO DE NUEVO USUARIO ---");
         System.out.println("¿Qué tipo de rol tendrá el nuevo usuario?");
         System.out.println("1. Solicitante (Empleado Regular)");
         System.out.println("2. Asignatario (Técnico de Soporte)");
         System.out.println("3. Cancelar");
         System.out.print("Seleccione (1-3): ");
-
         int tipoRol = 0;
         try {
-            tipoRol = Integer.parseInt(scanner.nextLine());
+            tipoRol = Integer.parseInt(scanner.nextLine().trim());
         } catch (Exception e) {
             System.out.println("Entrada inválida. Operación cancelada.");
             return;
         }
-
+        if (tipoRol == 3) {
+            System.out.println("Operación cancelada por el usuario.");
+            return;
+        }
         if (tipoRol != 1 && tipoRol != 2) {
             System.out.println("Opción no válida. Operación cancelada.");
             return;
         }
-
-        System.out.print("ID del Usuario (Ej. EMP-099): ");
-        String idUsuario = scanner.nextLine();
         System.out.print("Nombre: ");
-        String nombre = scanner.nextLine();
+        String nombre = scanner.nextLine().trim();
         System.out.print("Apellido: ");
-        String apellido = scanner.nextLine();
+        String apellido = scanner.nextLine().trim();
         System.out.print("Cédula: ");
-        String cedula = scanner.nextLine();
-        System.out.print("Usuario Red Bancaria: ");
-        String red = scanner.nextLine();
+        String cedula = scanner.nextLine().trim();
         System.out.print("Contraseña: ");
-        String pass = scanner.nextLine();
+        String pass = scanner.nextLine().trim();
 
         if (tipoRol == 1) {
-            System.out.println("\n--- Datos del Departamento ---");
-            System.out.print("Nombre del Depto (Ej. Contabilidad): ");
-            String nombreDepto = scanner.nextLine();
-            System.out.print("Nivel de criticidad (1 al 10): ");
-            int criticidad = Integer.parseInt(scanner.nextLine());
-            Departamento nuevoDepto = new Departamento("DEP-NEW", nombreDepto, criticidad);
+            System.out.println("\n---SELECCIÓN DE DEPARTAMENTO ---");
+            System.out.println("Departamentos disponibles:");
+            gestor.listarDepartamentos();
+            System.out.print("\nIngrese el código del Departamento (Ej. DEP-001): ");
+            String idDeptoSeleccionado = scanner.nextLine().trim();
+            Departamento deptoExistente = gestor.buscarDepartamentoPorId(idDeptoSeleccionado);
+            if (deptoExistente == null) {
+                System.out.println("El código de departamento ingresado no existe. Operación cancelada.");
+                return;
+            }
+            String idUsuarioAuto = gestor.generarNuevoIdUsuario("SOLICITANTE");
             Solicitante nuevoSolicitante = new Solicitante(
-                    idUsuario, nombre, apellido, cedula, red, pass, RolUsuario.SOLICITANTE, nuevoDepto
+                    idUsuarioAuto, nombre, apellido, cedula, pass, RolUsuario.SOLICITANTE, deptoExistente
             );
-            gestor.registrarUsuario(nuevoSolicitante);
-            System.out.println("Solicitante registrado exitosamente en la Tabla Hash!");
+            if (gestor.registrarUsuario(nuevoSolicitante)) {
+                System.out.println("\nSolicitante registrado exitosamente en el departamento: " + deptoExistente.getNombreArea());
+                System.out.println("CÓDIGO ASIGNADO: " + idUsuarioAuto);
 
+                GestorPersistencia.guardarEstado(this.gestor);
+            } else {
+                System.out.println("No se pudo registrar el Solicitante.");
+            }
         } else if (tipoRol == 2) {
-            Asignatario nuevoAsignatario = new Asignatario(
-                    idUsuario, nombre, apellido, cedula, red, pass, RolUsuario.ASIGNATARIO
-            );
-            gestor.registrarUsuario(nuevoAsignatario);
-            gestor.registrarAsignatarioActivo(nuevoAsignatario);
+            String idUsuarioAuto = gestor.generarNuevoIdUsuario("ASIGNATARIO");
 
-            System.out.println("zAsignatario técnico registrado y activado para recibir tickets!");
+            Asignatario nuevoAsignatario = new Asignatario(
+                    idUsuarioAuto, nombre, apellido, cedula, pass, RolUsuario.ASIGNATARIO
+            );
+
+            if (gestor.registrarUsuario(nuevoAsignatario)) {
+                gestor.registrarAsignatarioActivo(nuevoAsignatario);
+                System.out.println("\nAsignatario técnico registrado y activado para recibir tickets.");
+                System.out.println("CÓDIGO ASIGNADO: " + idUsuarioAuto);
+                GestorPersistencia.guardarEstado(this.gestor);
+            } else {
+                System.out.println("No se pudo registrar el Asignatario.");
+            }
         }
     }
     private void mostrarAsignatariosActivos() {
-
-        System.out.println("\n--- 👥 LISTA DE ASIGNATARIOS TÉCNICOS ACTIVOS ---");
+        System.out.println("\n---LISTA DE ASIGNATARIOS TÉCNICOS ACTIVOS ---");
         ListaEnlazada<Asignatario> asignatarios = gestor.getAsignatariosActivos();
-
-        // Validamos si la lista está vacía
         if (asignatarios == null || asignatarios.estaVacia()) {
-            System.out.println("⚠️ No hay asignatarios técnicos registrados o activos en el sistema.");
+            System.out.println("No hay asignatarios técnicos registrados o activos en el sistema.");
             return;
         }
-
         System.out.printf("%-10s | %-25s | %-15s | %-15s\n", "ID", "NOMBRE COMPLETO", "USUARIO RED", "TICKETS EN COLA");
         System.out.println("------------------------------------------------------------------------------");
-
         for (int i = 0; i < asignatarios.getTamanio(); i++) {
             Asignatario asig = asignatarios.obtener(i);
             String nombreCompleto = asig.getNombreCompleto();
             int cantTickets = asig.getTicketeraPersonal().getTamanio();
-
-            System.out.printf("%-10s | %-25s | %-15s | %-15d\n",
+            System.out.printf("%-10s | %-25s | %-15d\n",
                     asig.getIdUsuario(),
                     nombreCompleto,
-                    asig.getUsuarioRedBancaria(),
                     cantTickets);
         }
     }
     private void mostrarSolicitantesRegistrados() {
         System.out.println("\n---LISTA DE SOLICITANTES REGISTRADOS ---");
         ListaEnlazada<Solicitante> solicitantes = gestor.getSolicitantesRegistrados();
-
         if (solicitantes == null || solicitantes.estaVacia()) {
             System.out.println("No hay solicitantes registrados en la Tabla Hash.");
             return;
         }
-
         System.out.printf("%-10s | %-25s | %-12s | %-20s | %-15s\n",
                 "ID", "NOMBRE COMPLETO", "CÉDULA", "DEPARTAMENTO", "USUARIO RED");
         System.out.println("-----------------------------------------------------------------------------------------");
-
         for (int i = 0; i < solicitantes.getTamanio(); i++) {
             Solicitante sol = solicitantes.obtener(i);
             String nombreCompleto = sol.getNombreCompleto();
             String nombreDepto = (sol.getDepartamento() != null) ? sol.getDepartamento().getNombreArea() : "Sin Asignar";
-
-            System.out.printf("%-10s | %-25s | %-12s | %-20s | %-15s\n",
+            System.out.printf("%-10s | %-25s | %-12s | %-20s \n",
                     sol.getIdUsuario(),
                     nombreCompleto,
                     sol.getCedula(),
-                    nombreDepto,
-                    sol.getUsuarioRedBancaria());
+                    nombreDepto);
         }
     }
     private void mostrarTicketsActivos() {
@@ -361,10 +365,10 @@ public class VistaConsola {
         }
     }
     private void mostrarTicketsResueltos() {
-        System.out.println("\n--- ✅ HISTORIAL DE TICKETS RESUELTOS ---");
+        System.out.println("\n---HISTORIAL DE TICKETS RESUELTOS ---");
         ListaEnlazada<Ticket> resueltos = gestor.getHistorialTicketsResueltos();
         if (resueltos == null || resueltos.estaVacia()) {
-            System.out.println("ℹ️ Aún no hay tickets registrados como resueltos en el historial.");
+            System.out.println("Aún no hay tickets registrados como resueltos en el historial.");
             return;
         }
         System.out.printf("%-10s | %-13s | %-25s | %-20s | %-15s\n",
@@ -395,7 +399,7 @@ public class VistaConsola {
         System.out.print("¿Está seguro de que desea eliminar al usuario '" + identificador + "'? (S/N): ");
         String confirmacion = scanner.nextLine().trim();
         if (confirmacion.equalsIgnoreCase("S")) {
-            boolean exito = gestor.eliminarUsuario(identificador, usuarioLogueado.getUsuarioRedBancaria());
+            boolean exito = gestor.eliminarUsuario(identificador, usuarioLogueado.getIdUsuario());
             if (exito) {
                 System.out.println("Usuario '" + identificador + "' eliminado exitosamente del catálogo.");
             } else {
@@ -406,7 +410,7 @@ public class VistaConsola {
         }
     }
     private void mostrarOpcionesListas() {
-        System.out.println("\n--- 📜 SUBMENÚ: CONSULTA DE LISTAS ---");
+        System.out.println("\n---SUBMENÚ: CONSULTA DE LISTAS ---");
         System.out.println("1. Ver lista de Asignatarios activos");
         System.out.println("2. Ver lista de Solicitantes registrados");
         System.out.println("0. Volver al menú de administrador");
@@ -434,7 +438,6 @@ public class VistaConsola {
             System.out.println("Error: No hay una sesión de asignatario activa.");
             return;
         }
-
         Asignatario tecnico = (Asignatario) this.usuarioLogueado;
         ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
         if (cola == null || cola.estaVacia()) {
@@ -455,11 +458,9 @@ public class VistaConsola {
             }
             ordenados[j + 1] = actual;
         }
-
         System.out.printf("%-3s | %-10s | %-13s | %-25s | %-10s | %-8s | %-12s | %-12s\n",
                 "#", "CÓDIGO", "TIPO", "TÍTULO", "PRIORIDAD", "PUNTAJE", "ESTADO", "FECHA LÍMITE");
         System.out.println("--------------------------------------------------------------------------------------------------------------");
-
         for (int i = 0; i < n; i++) {
             Ticket t = ordenados[i];
             String tipo = (t instanceof TicketIncidencia) ? "Incidencia" : "Requerimiento";
@@ -481,7 +482,6 @@ public class VistaConsola {
             System.out.println("Error: No hay una sesión de asignatario activa.");
             return;
         }
-
         Asignatario tecnico = (Asignatario) this.usuarioLogueado;
         ListaEnlazada<Ticket> cola = tecnico.getTicketeraPersonal();
         if (cola == null || cola.estaVacia()) {
@@ -501,19 +501,15 @@ public class VistaConsola {
                 siguiente = t;
             }
         }
-
         if (siguiente == null) {
             System.out.println("No hay tickets pendientes por atender.");
             return;
         }
-
         siguiente.cambiarEstado(EstadoTicket.EN_PROGRESO);
-
         String solicitante = (siguiente.getSolicitante() != null)
                 ? siguiente.getSolicitante().getNombreCompleto()
                 : "Anónimo";
         String tipo = (siguiente instanceof TicketIncidencia) ? "INCIDENCIA TÉCNICA" : "REQUERIMIENTO DE SERVICIO";
-
         System.out.println("Has tomado el siguiente ticket:");
         System.out.println("====================================================");
         System.out.println(" CÓDIGO       : " + siguiente.getCodigoTicket());

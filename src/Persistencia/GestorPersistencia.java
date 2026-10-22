@@ -24,19 +24,17 @@ private static final String RUTA_ARCHIVO = "datos_sistema.dat";
     }
     public static GestorSoporteBancario cargarEstado() {
         File archivo = new File(RUTA_ARCHIVO);
-
-        // Si el archivo no existe (primera ejecución), se retorna un Gestor nuevo
         if (!archivo.exists()) {
-            System.out.println("ℹ️ No se encontró archivo de datos previo. Creando un sistema nuevo...");
+            System.out.println("No se encontró archivo de datos previo. Creando un sistema nuevo...");
             return new GestorSoporteBancario();
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
             GestorSoporteBancario gestorCargado = (GestorSoporteBancario) ois.readObject();
-            System.out.println("📂 Datos cargados exitosamente desde " + RUTA_ARCHIVO);
+            System.out.println("Datos cargados exitosamente desde " + RUTA_ARCHIVO);
             return gestorCargado;
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("⚠️ Error al deserializar el archivo. Se creará una instancia limpia: " + e.getMessage());
+            System.err.println("Error al deserializar el archivo. Se creará una instancia limpia: " + e.getMessage());
             return new GestorSoporteBancario();
         }
     }

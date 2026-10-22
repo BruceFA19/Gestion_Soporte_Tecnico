@@ -52,16 +52,13 @@ public class TablaHash<K, V> implements Serializable {
     public V obtener(K clave) {
         int indice = calcularIndice(clave);
         NodoHash<K, V> actual = arreglo[indice];
-
-        // Buscamos dentro de la cubeta correspondiente
         while (actual != null) {
             if (actual.clave.equals(clave)) {
-                return actual.valor; // ¡Lo encontramos en O(1)!
+                return actual.valor;
             }
             actual = actual.siguiente;
         }
-
-        return null; // El usuario no existe
+        return null;
     }
     public boolean eliminar(K clave) {
         int indice = calcularIndice(clave);
@@ -99,5 +96,8 @@ public class TablaHash<K, V> implements Serializable {
             }
         }
         return listaValores;
+    }
+    public boolean esVacia() {
+        return this.tamanio == 0;
     }
 }

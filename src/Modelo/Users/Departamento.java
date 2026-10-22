@@ -1,6 +1,8 @@
 package Modelo.Users;
 
-public class Departamento {
+import java.io.Serializable;
+
+public class Departamento implements Serializable {
 
     private String idDepartamento;
     private String nombreArea;
