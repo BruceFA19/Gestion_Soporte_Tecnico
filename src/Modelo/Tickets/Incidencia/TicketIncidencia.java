@@ -67,6 +67,7 @@ public class TicketIncidencia extends Ticket {
         } else {
             this.nivelPrioridad = NivelPrioridad.BAJA;
         }
+        this.puntajePrioridad = this.puntajeTotalPrioridad;
         long horasEstimadas = this.calcularTiempoEstimadoAtencion();
         this.fechaLimiteResolucion = this.fechaCreacion.plusHours(horasEstimadas);
     }

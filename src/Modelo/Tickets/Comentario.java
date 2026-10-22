@@ -9,4 +9,19 @@ public class Comentario implements Serializable {
     private String texto;
     private LocalDateTime fechaCreacion;
 
+    public Comentario(String idAutor, String texto) {
+        this.idAutor = idAutor;
+        this.texto = texto;
+        this.fechaCreacion = LocalDateTime.now();
+    }  
+    
+    public String getIdAutor() { 
+        return idAutor; 
+        }
+    public String getTexto() { 
+        return texto; 
+    }
+    public LocalDateTime getFechaCreacion() { 
+        return fechaCreacion; 
+    }
 }

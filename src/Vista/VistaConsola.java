@@ -8,6 +8,7 @@ import Modelo.Tickets.Incidencia.TipoProblema;
 import Modelo.Tickets.Requerimiento.TicketRequerimiento;
 import Modelo.Tickets.Requerimiento.TipoServicio;
 import Modelo.Tickets.Ticket;
+import Modelo.Tickets.Comentario;
 import Modelo.Users.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -525,11 +526,135 @@ public class VistaConsola {
         System.out.println(" FECHA LÍMITE : " + formatearFecha(siguiente.getFechaLimiteResolucion()));
         System.out.println("====================================================");
     }
-    private void resolverTicketEnAtencion(){}
-    private void verDetalleTicket(){}
-    private void agregarComentarioTicket(){}
-    private void gestionarAprobacionRequerimientos(){}
-    private void mostrarMiHistorialResueltos(){}
+    private void resolverTicketEnAtencion() {
+    System.out.println("\n--- RESOLVER TICKET EN ATENCIÓN ---");
+    ListaEnlazada<Ticket> cola = ((Asignatario) usuarioLogueado).getTicketeraPersonal();
+    for (int i = 0; i < cola.getTamanio(); i++) {
+        Ticket t = cola.obtener(i);
+        if (t.getEstado() == EstadoTicket.EN_PROGRESO) {
+            t.cambiarEstado(EstadoTicket.RESUELTO);
+            cola.eliminar(i);
+            gestor.getHistorialTicketsResueltos().agregar(t);
+            System.out.println("Ticket " + t.getCodigoTicket() + " resuelto correctamente.");
+            return;
+        }
+    }
+    System.out.println("No tienes ningún ticket en atención.");
+}
+
+    private void verDetalleTicket() {
+        System.out.println("\n--- DETALLE DE TICKET ---");
+        System.out.print("Ingrese el CÓDIGO del ticket: ");
+        String codigo = scanner.nextLine().trim();
+        ListaEnlazada<Ticket> cola = ((Asignatario) usuarioLogueado).getTicketeraPersonal();
+        for (int i = 0; i < cola.getTamanio(); i++) {
+            Ticket t = cola.obtener(i);
+            if (t.getCodigoTicket().equalsIgnoreCase(codigo)) {
+                System.out.println("====================================================");
+                System.out.println(" CÓDIGO       : " + t.getCodigoTicket());
+                System.out.println(" TÍTULO       : " + t.getTitulo());
+                System.out.println(" DETALLE      : " + t.getDescripcion());
+                System.out.println(" SOLICITANTE  : " + t.getSolicitante().getNombreCompleto());
+                System.out.println(" PRIORIDAD    : " + t.getNivelPrioridad() + " (puntaje " + t.getPuntajePrioridad() + ")");
+                System.out.println(" ESTADO       : " + t.getEstado());
+                System.out.println(" FECHA LÍMITE : " + formatearFecha(t.getFechaLimiteResolucion()));
+                System.out.println("--- COMENTARIOS ---");
+                if (t.getHistorialComentarios().estaVacia()) {
+                    System.out.println(" (Sin comentarios)");
+                }
+                for (Comentario c : t.getHistorialComentarios()) {
+                    System.out.println(" [" + formatearFecha(c.getFechaCreacion()) + "] "
+                            + c.getIdAutor() + ": " + c.getTexto());
+                }
+                System.out.println("====================================================");
+                return;
+            }
+        }
+        System.out.println("No se encontró ese ticket en tu cola.");
+    }
+
+    private void agregarComentarioTicket() {
+        System.out.println("\n--- AGREGAR COMENTARIO ---");
+        System.out.print("Ingrese el CÓDIGO del ticket: ");
+        String codigo = scanner.nextLine().trim();
+        ListaEnlazada<Ticket> cola = ((Asignatario) usuarioLogueado).getTicketeraPersonal();
+        for (int i = 0; i < cola.getTamanio(); i++) {
+            Ticket t = cola.obtener(i);
+            if (t.getCodigoTicket().equalsIgnoreCase(codigo)) {
+                System.out.print("Escriba su comentario: ");
+                String texto = scanner.nextLine().trim();
+                if (texto.isEmpty()) {
+                    System.out.println("El comentario no puede estar vacío.");
+                    return;
+                }
+                t.getHistorialComentarios().agregar(new Comentario(usuarioLogueado.getIdUsuario(), texto));
+                System.out.println("Comentario agregado.");
+                return;
+            }
+        }
+        System.out.println("No se encontró ese ticket en tu cola.");
+    }
+
+    private void gestionarAprobacionRequerimientos() {
+        System.out.println("\n--- REQUERIMIENTOS PENDIENTES DE APROBACIÓN ---");
+        ListaEnlazada<Ticket> cola = ((Asignatario) usuarioLogueado).getTicketeraPersonal();
+        boolean hayPendientes = false;
+        for (int i = 0; i < cola.getTamanio(); i++) {
+            Ticket t = cola.obtener(i);
+            if (t instanceof TicketRequerimiento req && !req.isEstaAprobado()) {
+                hayPendientes = true;
+                System.out.println(t.getCodigoTicket() + " | " + t.getTitulo()
+                        + " | " + req.getTipoServicio().getNombreServicio());
+            }
+        }
+        if (!hayPendientes) {
+            System.out.println("No tienes requerimientos pendientes de aprobación.");
+            return;
+        }
+        System.out.print("Ingrese el CÓDIGO a gestionar: ");
+        String codigo = scanner.nextLine().trim();
+        for (int i = 0; i < cola.getTamanio(); i++) {
+            Ticket t = cola.obtener(i);
+            if (t instanceof TicketRequerimiento req && !req.isEstaAprobado()
+                    && t.getCodigoTicket().equalsIgnoreCase(codigo)) {
+                System.out.print("1. Aprobar | 2. Rechazar: ");
+                String op = scanner.nextLine().trim();
+                if (op.equals("1")) {
+                    req.aprobarRequerimiento();
+                    System.out.println("Requerimiento aprobado.");
+                } else if (op.equals("2")) {
+                    t.setEstado(EstadoTicket.CANCELADO);
+                    cola.eliminar(i);
+                    System.out.println("Requerimiento rechazado y retirado de tu cola.");
+                } else {
+                    System.out.println("Opción no válida.");
+                }
+                return;
+            }
+        }
+        System.out.println("No se encontró un requerimiento pendiente con ese código.");
+    }
+
+    private void mostrarMiHistorialResueltos() {
+        System.out.println("\n--- MI HISTORIAL DE TICKETS RESUELTOS ---");
+        ListaEnlazada<Ticket> resueltos = gestor.getHistorialTicketsResueltos();
+        int contador = 0;
+        for (int i = 0; i < resueltos.getTamanio(); i++) {
+            Ticket t = resueltos.obtener(i);
+            if (t.getAsignatario() != null
+                    && t.getAsignatario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                System.out.println(t.getCodigoTicket() + " | " + recortar(t.getTitulo(), 25)
+                        + " | " + t.getSolicitante().getNombreCompleto()
+                        + " | Resuelto: " + formatearFecha(t.getFechaResolucion()));
+                contador++;
+            }
+        }
+        if (contador == 0) {
+            System.out.println("Aún no has resuelto tickets.");
+        } else {
+            System.out.println("\nTotal resueltos: " + contador);
+        }
+    }
     //Metodos para el menu solicitante
     private void crearNuevoTicket() {
         int subOpcion = 0;

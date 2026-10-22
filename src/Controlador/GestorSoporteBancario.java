@@ -213,7 +213,6 @@ public class GestorSoporteBancario implements Serializable {
             }
             if (tecnicoMenosCargado != null) {
                 nuevoTicket.asignarTecnico(tecnicoMenosCargado);
-                nuevoTicket.setEstado(EstadoTicket.EN_PROGRESO);
                 tecnicoMenosCargado.getTicketeraPersonal().agregar(nuevoTicket);
                 System.out.println("🤖 Ticket asignado automáticamente al técnico: "
                         + tecnicoMenosCargado.getNombreCompleto());
