@@ -127,7 +127,6 @@ public class VistaConsola {
         } while (opcion != 8);
         // Aquí pondremos las opciones de ver tickets, atender siguiente, etc.
     }
-
     private void mostrarMenuSolicitante(Solicitante solicitante) {
         int opcion = 0;
         do {
@@ -169,7 +168,6 @@ public class VistaConsola {
             }
         } while (opcion != 6);
     }
-
     private void mostrarMenuAdministrador(Administrador administrador) {
         int opcion = 0;
         do {
@@ -214,7 +212,6 @@ public class VistaConsola {
             }
         } while (opcion != 7);
     }
-
     //Metodos para el menu administrador
     private void crearNuevoUsuario() {
         System.out.println("\n--- 📝 REGISTRO DE NUEVO USUARIO ---");
@@ -273,7 +270,6 @@ public class VistaConsola {
             System.out.println("zAsignatario técnico registrado y activado para recibir tickets!");
         }
     }
-
     private void mostrarAsignatariosActivos() {
 
         System.out.println("\n--- 👥 LISTA DE ASIGNATARIOS TÉCNICOS ACTIVOS ---");
@@ -300,7 +296,6 @@ public class VistaConsola {
                     cantTickets);
         }
     }
-
     private void mostrarSolicitantesRegistrados() {
         System.out.println("\n---LISTA DE SOLICITANTES REGISTRADOS ---");
         ListaEnlazada<Solicitante> solicitantes = gestor.getSolicitantesRegistrados();
@@ -327,7 +322,6 @@ public class VistaConsola {
                     sol.getUsuarioRedBancaria());
         }
     }
-
     private void mostrarTicketsActivos() {
         System.out.println("\n---TICKETS ACTIVOS EN EL SISTEMA ---");
         ListaEnlazada<Ticket> tickets = gestor.getTicketsActivos();
@@ -365,7 +359,6 @@ public class VistaConsola {
                     detalleCat);
         }
     }
-
     private void mostrarTicketsResueltos() {
         System.out.println("\n--- ✅ HISTORIAL DE TICKETS RESUELTOS ---");
         ListaEnlazada<Ticket> resueltos = gestor.getHistorialTicketsResueltos();
@@ -390,7 +383,6 @@ public class VistaConsola {
                     "RESUELTO");
         }
     }
-
     private void eliminarUsuario() {
         System.out.println("\n---ELIMINAR USUARIO ---");
         System.out.print("Ingrese el ID o Usuario de Red de la cuenta a eliminar: ");
@@ -412,7 +404,6 @@ public class VistaConsola {
             System.out.println("Operación cancelada.");
         }
     }
-
     private void mostrarOpcionesListas() {
         System.out.println("\n--- 📜 SUBMENÚ: CONSULTA DE LISTAS ---");
         System.out.println("1. Ver lista de Asignatarios activos");
@@ -435,7 +426,6 @@ public class VistaConsola {
                 break;
         }
     }
-
     //Metodos para el menu asignatario
     private void mostrarMiColaTickets() {
         System.out.println("\n--- MI COLA DE TICKETS ---");
@@ -484,7 +474,6 @@ public class VistaConsola {
         }
         System.out.println("\nTotal en cola: " + n);
     }
-
     private void atenderSiguienteTicket() {
         System.out.println("\n--- ATENDER SIGUIENTE TICKET ---");
         if (!(this.usuarioLogueado instanceof Asignatario)) {
@@ -536,7 +525,11 @@ public class VistaConsola {
         System.out.println(" FECHA LÍMITE : " + formatearFecha(siguiente.getFechaLimiteResolucion()));
         System.out.println("====================================================");
     }
-
+    private void resolverTicketEnAtencion(){}
+    private void verDetalleTicket(){}
+    private void agregarComentarioTicket(){}
+    private void gestionarAprobacionRequerimientos(){}
+    private void mostrarMiHistorialResueltos(){}
     //Metodos para el menu solicitante
     private void crearNuevoTicket() {
         int subOpcion = 0;
@@ -565,7 +558,6 @@ public class VistaConsola {
                 break;
         }
     }
-
     private void registrarIncidencia() {
         System.out.println("\n---REGISTRAR INCIDENCIA ---");
         //idEquipo
@@ -656,7 +648,6 @@ public class VistaConsola {
             System.out.println("Error al registrar la incidencia.");
         }
     }
-
     private void registrarRequerimiento() {
         System.out.println("\n---SOLICITAR REQUERIMIENTO ---");
         System.out.print("Ingrese el título del requerimiento: ");
@@ -711,7 +702,6 @@ public class VistaConsola {
             System.out.println("Error al registrar el requerimiento.");
         }
     }
-
     private int leerOpcionRango(int min, int max) {
         int valor = min;
         try {
@@ -726,7 +716,6 @@ public class VistaConsola {
         }
         return valor;
     }
-
     private void mostrarMisTicketsActivos() {
         System.out.println("\n--- MIS TICKETS ACTIVOS ---");
         if (this.usuarioLogueado == null) {
@@ -772,7 +761,6 @@ public class VistaConsola {
             System.out.println("====================================================");
         }
     }
-
     private void mostrarMisTicketsResueltos() {
         System.out.println("\n---HISTORIAL DE MIS TICKETS RESUELTOS ---");
         if (this.usuarioLogueado == null) {
@@ -817,7 +805,6 @@ public class VistaConsola {
             System.out.println("====================================================");
         }
     }
-
     private void cancelarTicketPendiente() {
         System.out.println("\n---CANCELAR TICKET PENDIENTE ---");
         if (this.usuarioLogueado == null) {
@@ -850,7 +837,6 @@ public class VistaConsola {
                 break;
         }
     }
-
     private void mostrarMiPerfil() {
         System.out.println("\n--- 👤 MI PERFIL DE SOLICITANTE ---");
 
@@ -880,7 +866,6 @@ public class VistaConsola {
         }
         System.out.println("====================================================");
     }
-
     //Metodos auxiliares
     private String recortar(String texto, int max) {
         if (texto == null) {
@@ -888,7 +873,6 @@ public class VistaConsola {
         }
         return (texto.length() <= max) ? texto : texto.substring(0, max - 3) + "...";
     }
-
     private boolean tieneMasPrioridad(Ticket a, Ticket b) {
         if (a.getPuntajePrioridad() != b.getPuntajePrioridad()) {
             return a.getPuntajePrioridad() > b.getPuntajePrioridad();
@@ -898,7 +882,6 @@ public class VistaConsola {
         }
         return a.getFechaCreacion().isBefore(b.getFechaCreacion());
     }
-
     private String formatearFecha(LocalDateTime fecha) {
         if (fecha == null) {
             return "N/A";

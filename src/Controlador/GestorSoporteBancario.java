@@ -12,7 +12,10 @@ import Modelo.Users.Asignatario;
 import Modelo.Users.Solicitante;
 import Modelo.Users.Usuario;
 import Persistencia.GestorPersistencia;
-public class GestorSoporteBancario {
+import java.io.Serializable;
+
+public class GestorSoporteBancario implements Serializable {
+    private static final long serialVersionUID = 1L;
     private ColaPrioridad<Ticket> colaEsperaGlobal;
     private ListaEnlazada<Ticket> historialTicketsResueltos;
     private TablaHash<String, Usuario> usuariosRegistrados;
@@ -240,7 +243,7 @@ public class GestorSoporteBancario {
             for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
                 Asignatario tec = asignatariosActivos.obtener(i);
                 if (tec.getTicketeraPersonal() != null) {
-                    ListaEnlazada<Ticket> listaTecnico = tec.getTicketeraPersonal().toListaEnlazada();
+                    ListaEnlazada<Ticket> listaTecnico = tec.getTicketeraPersonal();
                     for (int j = 0; j < listaTecnico.getTamanio(); j++) {
                         Ticket t = listaTecnico.obtener(j);
                         if (t.getSolicitante() != null && t.getSolicitante().getIdUsuario().equals(idSolicitante)) {
