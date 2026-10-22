@@ -14,5 +14,4 @@ public class AccionAuditoria implements Serializable {
     public String getTipoAccion() { return tipoAccion; }
     public String getCodigoTicket() { return codigoTicket; }
     public String getDetalle() { return detalle; }
-    
 }

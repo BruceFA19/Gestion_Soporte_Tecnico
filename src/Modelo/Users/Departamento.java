@@ -1,13 +1,9 @@
 package Modelo.Users;
-
 import java.io.Serializable;
-
 public class Departamento implements Serializable {
-
     private String idDepartamento;
     private String nombreArea;
     private int criticidadDepartamento;
-
     public Departamento(String idDepartamento, String nombreArea, int criticidadDepartamento) {
         this.idDepartamento = idDepartamento;
         this.nombreArea = nombreArea;

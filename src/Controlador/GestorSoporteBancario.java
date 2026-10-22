@@ -11,7 +11,6 @@ import Modelo.Users.Solicitante;
 import Modelo.Users.Usuario;
 import Persistencia.GestorPersistencia;
 import java.io.Serializable;
-
 public class GestorSoporteBancario implements Serializable {
     private static final long serialVersionUID = 1L;
     private ColaPrioridad<Ticket> colaEsperaGlobal;
@@ -23,7 +22,6 @@ public class GestorSoporteBancario implements Serializable {
     private int contadorTickets;
     private int contadorUsuarios;
     private ListaEnlazada<Departamento> listaDepartamentos = new ListaEnlazada<>();
-
     public GestorSoporteBancario() {
         this.colaEsperaGlobal = new ColaPrioridad<>();
         this.usuariosRegistrados = new TablaHash<>();
@@ -33,7 +31,6 @@ public class GestorSoporteBancario implements Serializable {
         this.contadorTickets = 1;
         this.contadorUsuarios = 1;
     }
-
     /*
     public Ticket registrarLlegadaIncidencia(Solicitante solicitante, String idEquipo, TipoProblema problema,
                                              int alcanceUsuarios, int gradoBloqueo) {
@@ -66,11 +63,9 @@ public class GestorSoporteBancario implements Serializable {
     public ListaEnlazada<Ticket> getHistorialTicketsResueltos() {
         return historialTicketsResueltos;
     }
-
     public boolean esSistemaNuevo() {
         return this.usuariosRegistrados == null || this.usuariosRegistrados.esVacia();
     }
-
     public void asignarTicketAutomaticamente(Ticket nuevoTicket) {
         if (asignatariosActivos.estaVacia()) {
             colaEsperaGlobal.encolar(nuevoTicket);
@@ -94,7 +89,6 @@ public class GestorSoporteBancario implements Serializable {
                     " asignado automáticamente a " + tecnicoMenosCargado.getNombreCompleto());
         }
     }
-
     public boolean registrarUsuario(Usuario nuevoUsuario) {
         if (nuevoUsuario == null || nuevoUsuario.getIdUsuario() == null) {
             return false;
@@ -105,7 +99,6 @@ public class GestorSoporteBancario implements Serializable {
         this.usuariosRegistrados.insertar(nuevoUsuario.getIdUsuario(), nuevoUsuario);
         return true;
     }
-
     public Usuario validarAcceso(String idUsuario, String contrasena) {
         Usuario usuario = usuariosRegistrados.obtener(idUsuario);
         if (usuario != null && usuario.getContraseniaHash().equals(contrasena)) {
@@ -113,55 +106,38 @@ public class GestorSoporteBancario implements Serializable {
         }
         return null;
     }
-
     public Ticket buscarTicketPorCodigo(String codigoTicket) {
         // TODO: Buscar en colaTurnosPendientes y en historicoTickets.
         return null;
     }
-
     public boolean deshacerUltimaAccion() {
         // TODO: Sacar la ultima AccionAuditoria de pilaAuditoria y revertirla.
         return false;
     }
-
     public void registrarAsignatarioActivo(Asignatario asignatario) {
         asignatariosActivos.agregar(asignatario);
     }
-
     /*public boolean guardarEstadoSistema() {
         return gestorPersistencia.guardarUsuariosEnArchivo(listaUsuarios)
                 && gestorPersistencia.guardarTicketsEnArchivo(colaEsperaGlobal, historicoTickets);
     }*/
-    public boolean cargarEstadoSistema() {
-        // TODO: Cargar usuarios y tickets con gestorPersistencia y reconstruir la cola y el historico.
-        return false;
-    }
-
     public ListaEnlazada<Asignatario> getAsignatariosActivos() {
         return asignatariosActivos;
     }
-
     public ListaEnlazada<Solicitante> getSolicitantesRegistrados() {
         ListaEnlazada<Solicitante> solicitantes = new ListaEnlazada<>();
-        // Obtenemos todos los usuarios almacenados en la Tabla Hash
-        // (Asegúrate de que tu TablaHash tenga un método para obtener sus valores,
-        //  o un método obtenerValores() que devuelva una ListaEnlazada<Usuario>)
         ListaEnlazada<Usuario> todosLosUsuarios = usuariosRegistrados.obtenerValores();
-
         if (todosLosUsuarios != null) {
             for (int i = 0; i < todosLosUsuarios.getTamanio(); i++) {
                 Usuario u = todosLosUsuarios.obtener(i);
-
                 // Filtramos usando polimorfismo/instanceof
                 if (u instanceof Solicitante) {
                     solicitantes.agregar((Solicitante) u);
                 }
             }
         }
-
         return solicitantes;
     }
-
     public ListaEnlazada<Ticket> getTicketsActivos() {
         ListaEnlazada<Ticket> ticketsActivos = new ListaEnlazada<>();
         if (colaEsperaGlobal != null) {
@@ -184,7 +160,6 @@ public class GestorSoporteBancario implements Serializable {
         }
         return ticketsActivos;
     }
-
     public boolean eliminarUsuario(String idAEliminar, String idAdminLogueado) {
         if (idAEliminar.equalsIgnoreCase(idAdminLogueado)) {
             System.out.println("No puedes eliminar tu propia cuenta mientras estás en sesión.");
@@ -213,7 +188,6 @@ public class GestorSoporteBancario implements Serializable {
         }
         return eliminado;
     }
-
     private void removerAsignatarioActivo(Asignatario asig) {
         for (int i = 0; i < asignatariosActivos.getTamanio(); i++) {
             if (asignatariosActivos.obtener(i).getIdUsuario().equals(asig.getIdUsuario())) {
@@ -222,13 +196,11 @@ public class GestorSoporteBancario implements Serializable {
             }
         }
     }
-
     public String generarNuevoIdTicket() {
         String idTicket = String.format("TCK-%03d", contadorTickets);
         contadorTickets++;
         return idTicket;
     }
-
     public boolean registrarYAsignarTicket(Ticket nuevoTicket) {
         if (nuevoTicket == null) {
             return false;
@@ -247,7 +219,7 @@ public class GestorSoporteBancario implements Serializable {
             if (tecnicoMenosCargado != null) {
                 nuevoTicket.asignarTecnico(tecnicoMenosCargado);
                 tecnicoMenosCargado.getTicketeraPersonal().agregar(nuevoTicket);
-                System.out.println("🤖 Ticket asignado automáticamente al técnico: "
+                System.out.println("Ticket asignado automáticamente al técnico: "
                         + tecnicoMenosCargado.getNombreCompleto());
                 return true;
             }
@@ -257,7 +229,6 @@ public class GestorSoporteBancario implements Serializable {
         System.out.println("No hay técnicos activos disponibles. Ticket ingresado a la Cola de Espera Global.");
         return true;
     }
-
     public ListaEnlazada<Ticket> obtenerTicketsActivosPorSolicitante(String idSolicitante) {
         ListaEnlazada<Ticket> ticketsActivos = new ListaEnlazada<>();
         if (idSolicitante == null || idSolicitante.isEmpty()) {
@@ -289,7 +260,6 @@ public class GestorSoporteBancario implements Serializable {
 
         return ticketsActivos;
     }
-
     public ListaEnlazada<Ticket> obtenerTicketsResueltosPorSolicitante(String idSolicitante) {
         ListaEnlazada<Ticket> misResueltos = new ListaEnlazada<>();
         if (idSolicitante == null || idSolicitante.isEmpty() || historialTicketsResueltos == null) {
@@ -304,7 +274,6 @@ public class GestorSoporteBancario implements Serializable {
         }
         return misResueltos;
     }
-
     public int cancelarTicketPendiente(String codigoTicket, String idSolicitante) {
         if (codigoTicket == null || codigoTicket.isEmpty() || colaEsperaGlobal == null) {
             return 0;
@@ -343,7 +312,6 @@ public class GestorSoporteBancario implements Serializable {
         ticketAAnular.setEstado(EstadoTicket.CANCELADO);
         return 1;
     }
-
     public String generarNuevoIdUsuario(String tipoUsuario) {
         String prefijo;
         if (tipoUsuario == null) {
@@ -366,13 +334,11 @@ public class GestorSoporteBancario implements Serializable {
         this.contadorUsuarios++;
         return idGenerado;
     }
-
     public void registrarDepartamento(Departamento depto) {
         if (depto != null) {
             this.listaDepartamentos.agregar(depto);
         }
     }
-
     public Departamento buscarDepartamentoPorId(String idDepto) {
         if (idDepto == null || this.listaDepartamentos == null) {
             return null;
@@ -386,13 +352,11 @@ public class GestorSoporteBancario implements Serializable {
         }
         return null;
     }
-
     public void listarDepartamentos() {
         if (this.listaDepartamentos == null || this.listaDepartamentos.estaVacia()) {
             System.out.println("No hay departamentos registrados.");
             return;
         }
-
         Nodo<Departamento> actual = this.listaDepartamentos.getCabeza();
         while (actual != null) {
             Departamento d = actual.getDato();

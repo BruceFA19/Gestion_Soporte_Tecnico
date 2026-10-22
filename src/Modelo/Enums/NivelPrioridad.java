@@ -5,17 +5,11 @@ public enum NivelPrioridad {
     MEDIA(2),
     ALTA(3),
     CRITICA(4);
-
     private final int valor;
-
     NivelPrioridad(int valor) {
         this.valor = valor;
     }
-
     public int getValor() {
         return valor;
     }
-
-    //Codigo en espera de implementacion:
-    //BAJA, MEDIA, ALTA, CRITICA
 }

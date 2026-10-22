@@ -13,7 +13,6 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
     }
     public void agregar(T dato) {
         Nodo<T> nuevoNodo = new Nodo<>(dato);
-
         if (estaVacia()) {
             cabeza = nuevoNodo;
             cola = nuevoNodo;
@@ -27,7 +26,6 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
         if (indice < 0 || indice >= tamanio) {
             throw new IndexOutOfBoundsException("Índice fuera de rango: " + indice);
         }
-
         Nodo<T> actual = cabeza;
         for (int i = 0; i < indice; i++) {
             actual = actual.getSiguiente();
@@ -44,9 +42,7 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
         if (indice < 0 || indice >= tamanio) {
             throw new IndexOutOfBoundsException("Índice fuera de rango: " + indice);
         }
-
         T datoEliminado;
-
         // Caso A: Eliminar el primer elemento (cabeza)
         if (indice == 0) {
             datoEliminado = cabeza.getDato();
@@ -58,18 +54,12 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
         // Caso B: Eliminar en el medio o al final
         else {
             Nodo<T> anterior = cabeza;
-            // Viajamos hasta un vagón ANTES del que queremos eliminar
             for (int i = 0; i < indice - 1; i++) {
                 anterior = anterior.getSiguiente();
             }
-
             Nodo<T> aEliminar = anterior.getSiguiente();
             datoEliminado = aEliminar.getDato();
-
-            // "Saltamos" el vagón a eliminar, conectando el anterior con el siguiente
             anterior.setSiguiente(aEliminar.getSiguiente());
-
-            // Si el que eliminamos era el último, actualizamos la cola
             if (aEliminar == cola) {
                 cola = anterior;
             }
@@ -80,32 +70,27 @@ public class ListaEnlazada<T> implements Iterable<T>, Serializable {
     public int buscarIndice(T dato) {
         Nodo<T> actual = cabeza;
         int indice = 0;
-
         while (actual != null) {
-            // Usamos .equals() para comparar el contenido de los objetos
             if (actual.getDato().equals(dato)) {
                 return indice;
             }
             actual = actual.getSiguiente();
             indice++;
         }
-
-        return -1; // No se encontró
+        return -1;
     }
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private Nodo<T> actual = cabeza;
-
             @Override
             public boolean hasNext() {
-                return actual != null; // ¿Hay un siguiente vagón?
+                return actual != null;
             }
-
             @Override
             public T next() {
                 T dato = actual.getDato();
-                actual = actual.getSiguiente(); // Avanzamos al siguiente
+                actual = actual.getSiguiente();
                 return dato;
             }
         };

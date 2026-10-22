@@ -13,7 +13,6 @@ public class TablaHash<K, V> implements Serializable {
     public TablaHash(int capacidadInicial) {
         this.capacidad = capacidadInicial;
         this.tamanio = 0;
-        // En Java, crear arreglos de genéricos requiere este casteo
         this.arreglo = (NodoHash<K, V>[]) new NodoHash[capacidad];
     }
     public TablaHash() {
@@ -25,21 +24,16 @@ public class TablaHash<K, V> implements Serializable {
     public void insertar(K clave, V valor) {
         int indice = calcularIndice(clave);
         NodoHash<K, V> nuevoNodo = new NodoHash<>(clave, valor);
-
-        // Si la "cubeta" está vacía, entra directo
         if (arreglo[indice] == null) {
             arreglo[indice] = nuevoNodo;
             tamanio++;
         } else {
-            // Manejo de Colisiones: Recorremos la lista enlazada de esa cubeta
             NodoHash<K, V> actual = arreglo[indice];
             while (true) {
-                // Si la clave ya existe, actualizamos el valor (sobrescribimos)
                 if (actual.clave.equals(clave)) {
                     actual.valor = valor;
                     return;
                 }
-                // Si llegamos al final de la cadena de colisión, lo agregamos ahí
                 if (actual.siguiente == null) {
                     actual.siguiente = nuevoNodo;
                     tamanio++;

@@ -33,14 +33,12 @@ public class VistaConsola {
             System.out.println("1. Iniciar Sesión");
             System.out.println("2. Salir del Sistema");
             System.out.print("Seleccione una opción: ");
-
             //En caso de meter String
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 opcion = 0;
             }
-            //en caso e meter opcion numerica no valida
             switch (opcion) {
                 case 1:
                     procesarLogin();
@@ -672,10 +670,10 @@ public class VistaConsola {
                 registrarRequerimiento();
                 break;
             case 0:
-                System.out.println("ℹ️ Operación cancelada. Regresando...");
+                System.out.println("Operación cancelada. Regresando...");
                 break;
             default:
-                System.out.println("⚠️ Opción no válida.");
+                System.out.println("Opción no válida.");
                 break;
         }
     }
@@ -959,13 +957,11 @@ public class VistaConsola {
         }
     }
     private void mostrarMiPerfil() {
-        System.out.println("\n--- 👤 MI PERFIL DE SOLICITANTE ---");
-
+        System.out.println("\n---MI PERFIL DE SOLICITANTE ---");
         if (this.usuarioLogueado == null) {
-            System.out.println("⚠️ Error: No hay una sesión activa.");
+            System.out.println("Error: No hay una sesión activa.");
             return;
         }
-
         // Casteo seguro de la sesión actual al tipo Solicitante
         Solicitante solicitante = (Solicitante) this.usuarioLogueado;
 
@@ -974,8 +970,7 @@ public class VistaConsola {
         System.out.println("NOMBRE        : " + solicitante.getNombreCompleto());
         System.out.println("CÉDULA        : " + solicitante.getCedula());
         //System.out.println("CORREO        : " + solicitante.getCorreoElectronico());
-
-        // Información referencial del Departamento
+        // Inormación referencial del Departamento
         if (solicitante.getDepartamento() != null) {
             Departamento depto = solicitante.getDepartamento();
             System.out.println("DEPARTAMENTO  : " + depto.getNombreArea()
