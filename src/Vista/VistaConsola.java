@@ -357,7 +357,7 @@ public class VistaConsola {
                     t.getCodigoTicket(),
                     tipo,
                     t.getTitulo(),
-                    t.getNivelPrioridad(),
+                    t.getNivelPrioridad().getValor(),
                     solicitanteStr,
                     detalleCat);
         }
@@ -725,16 +725,16 @@ public class VistaConsola {
         TipoProblema tipoProblema;
         switch (catOp) {
             case 1:
-                tipoProblema = new TipoProblema("CAT-HW", "Falla de Hardware", 24);
+                tipoProblema = new TipoProblema("CAT-HW", "Falla de Hardware", 3);
                 break;
             case 2:
-                tipoProblema = new TipoProblema("CAT-SW", "Falla de Software", 12);
+                tipoProblema = new TipoProblema("CAT-SW", "Falla de Software", 2);
                 break;
             case 3:
-                tipoProblema = new TipoProblema("CAT-RED", "Conectividad/Red", 6);
+                tipoProblema = new TipoProblema("CAT-RED", "Conectividad/Red", 1);
                 break;
             default:
-                tipoProblema = new TipoProblema("CAT-GEN", "Falla General", 48);
+                tipoProblema = new TipoProblema("CAT-GEN", "Falla General", 4);
                 break;
         }
         //buscamos el solicitante
@@ -858,7 +858,7 @@ public class VistaConsola {
             System.out.println(" PRIORIDAD : " + t.getNivelPrioridad());
             System.out.println(" ESTADO    : " + t.getEstado());
             if (t.getAsignatario() != null) {
-                System.out.println(" TÉCNICO   : " + t.getAsignatario());
+                System.out.println(" TÉCNICO   : " + t.getAsignatario().getNombreCompleto());
             } else {
                 System.out.println(" TÉCNICO   : Sin asignar (En Cola de Espera Global)");
             }
